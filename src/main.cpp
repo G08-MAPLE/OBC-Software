@@ -1,18 +1,13 @@
 #include <Arduino.h>
+#include "main.hpp"
 
-// put function declarations here:
-int myFunction(int, int);
-
+//runs once on power up
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  startTasks();
 }
 
+//runs in an infinite while loop (not really needed because of RTOS)
 void loop() {
-  // put your main code here, to run repeatedly:
+  
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
