@@ -1,3 +1,5 @@
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE //Defined before esp_log.h as per espressif docs
+
 #include "XBEE_Tx.hpp"
 #include "freertos/FreeRTOS.h"
 #include "esp_system.h"
@@ -17,17 +19,20 @@
 int sendData(const char* logName, const char* data)
 {
     const int len = strlen(data);
+    // printf("Bytes to write: %d", len);
     const int txBytes = uart_write_bytes(UART_NUM_2, data, len);
+    // printf("Bytes written: %d", txBytes);
     ESP_LOGI(logName, "Wrote %d bytes", txBytes);
     return txBytes;
 }
 
-static void XBEE_tx(void * param){
-    
-    static const char *TX_TASK_TAG = "TX_TASK";
-    esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
+void XBEE_tx(void * param){
+    static const char *TX_TAG = "TX_TASK";
+    esp_log_level_set(TX_TAG, ESP_LOG_INFO);
     for(;;){
-        sendData(TX_TASK_TAG, "Hello world");
+        // printf("Sending Data");
+        sendData(TX_TAG, "Hello world");
+        // printf("Data sent");
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }
