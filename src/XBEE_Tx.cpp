@@ -19,9 +19,7 @@
 int sendData(const char* logName, const char* data)
 {
     const int len = strlen(data);
-    // printf("Bytes to write: %d", len);
     const int txBytes = uart_write_bytes(UART_NUM_2, data, len);
-    // printf("Bytes written: %d", txBytes);
     ESP_LOGI(logName, "Wrote %d bytes", txBytes);
     return txBytes;
 }
@@ -30,9 +28,7 @@ void XBEE_tx(void * param){
     static const char *TX_TAG = "TX_TASK";
     esp_log_level_set(TX_TAG, ESP_LOG_INFO);
     for(;;){
-        // printf("Sending Data");
         sendData(TX_TAG, "Hello world");
-        // printf("Data sent");
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(4000 / portTICK_PERIOD_MS);
     }
 }

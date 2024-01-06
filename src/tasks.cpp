@@ -12,21 +12,21 @@ void startTasks(){
     //     NULL             // Task handle
     // );
 
-    // xTaskCreate(
-    //     XBEE_rx,      // Function that should be called
-    //     "XBEE_rx",   // Name of the task (for debugging)
-    //     1024*2,            // Stack size (bytes) (MAY NEED MORE BASED ON BUFFER SIZE)
-    //     NULL,            // Parameter to pass
-    //     1,               // Task priority
-    //     NULL             // Task handle
-    // );
+    xTaskCreate(
+        XBEE_rx,      // Function that should be called
+        "XBEE_rx",   // Name of the task (for debugging)
+        1024*4,            // Stack size (bytes) (MAY NEED MORE BASED ON BUFFER SIZE)
+        NULL,            // Parameter to pass
+        configMAX_PRIORITIES,               // Task priority
+        NULL             // Task handle
+    );
 
     xTaskCreate(
         XBEE_tx,      // Function that should be called
         "XBEE_tx",   // Name of the task (for debugging)
         1024*2,            // Stack size (bytes) (MAY NEED MORE BASED ON BUFFER SIZE)
         NULL,            // Parameter to pass
-        1,               // Task priority
+        configMAX_PRIORITIES-1,               // Task priority
         NULL             // Task handle
     );
 
