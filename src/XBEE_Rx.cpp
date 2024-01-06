@@ -22,5 +22,6 @@ void XBEE_rx(void * param){
             ESP_LOG_BUFFER_HEXDUMP(RX_TAG, data, rxBytes, ESP_LOG_INFO);
         }
     }
+    //TODO create function to update parameter store with Rx data
     free(data);
 }

@@ -28,7 +28,7 @@ void XBEE_tx(void * param){
     static const char *TX_TAG = "TX_TASK";
     esp_log_level_set(TX_TAG, ESP_LOG_INFO);
     for(;;){
-        sendData(TX_TAG, "Hello world");
+        sendData(TX_TAG, "DART to GND_CONTROL\n");
         vTaskDelay(4000 / portTICK_PERIOD_MS);
     }
 }
