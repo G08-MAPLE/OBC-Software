@@ -1,7 +1,8 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#include "XBEE.hpp"
+#include "XBEE_Rx.hpp"
+#include "XBEE_Tx.hpp"
 #include "startup.hpp"
 #include "heartbeat.hpp"
 #include "burnwire.hpp"
