@@ -16,8 +16,8 @@
 #define PIN_JTAG_TDO 15
 
 //XBEE UART Bus
-#define PIN_XBEE_RX 4
-#define PIN_XBEE_TX 16
+#define PIN_XBEE_RX 16
+#define PIN_XBEE_TX 17
 
 //Debugging LEDs
 #define PIN_LEDB 18
