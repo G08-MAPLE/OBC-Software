@@ -3,25 +3,20 @@
 #include "state_machine.hpp"
 #include <stdio.h>
 #include "esp_log.h"
-         
+
+// State machine based off of Switch case of this article:
+//https://silverweed.github.io/Functional_State_Machines_in_C++/
+
 StateMachine::StateMachine() {
-    currentState = State::Boot;
+    state = State::BOOT;                                    // Set initial state to Boot no peripherals configured
     ESP_LOGI(SM_TAG, "State Machine Object Created");
-    //https://stackoverflow.com/questions/30228452/function-pointer-within-class
 }
 
 void StateMachine::_poweredState() {
     //If heartbeat thread exists kill it
-    if (currentState == State::Boot) {
+    if (state == State::BOOT) {
         //TODO (Low priority) check if UART already exists, then can skip UART init() in system check
     }
-    
-
-    //Add threadsafe checking procedure
-    //Define next/fail states for clarity
-    nextState = State::SystemOnline;
-    failState = State::Powered;
-    //--------------
 
     int systemStatus;
     //TODO: Check if all systems online
@@ -32,27 +27,17 @@ void StateMachine::_poweredState() {
     systemStatus = 0; //TODO = sum of system checks
     ESP_LOGI(SM_TAG, "Status: POWERED");
     if (systemStatus == 0) {
-        //Add threadsafe checking procedure
-        // currentState = nextState;
         ESP_LOGI(SM_TAG, "State: POWERED");
         ESP_LOGI(SM_TAG, "Changing States");
-        currentState = nextState;
+        state = State::ONLINE;
     }
     else {
-        //Add threadsafe checking procedure
-        // currentState = failState;
         ESP_LOGI(SM_TAG, "Changing States");
-        currentState = failState;
+        state = State::POWERED;
     }
 }
 
-void StateMachine::_systemOnlineState() {
-    //Add threadsafe checking procedure
-    //Define next/fail states for clarity
-    nextState = State::Armed;
-    failState = State::Powered;
-    //--------------
-
+void StateMachine::_onlineState() {
     //TODO: Create XBee Rx thread
     //  Check if UART object exists
     //  Should just read Rx buffer and parse data as fast as possible
@@ -63,39 +48,31 @@ void StateMachine::_systemOnlineState() {
 
     //TODO: Find way of communicating Response from Rx thread (Global var?)
     // if (Response is received from GND control) {
-    //     currentState = nextState;
-    //      state = StateMachine::armedState;
+    //      state = State::ARMED;
     //}
     // 
     // else if (Watchdog is triggered) {
-    //     currentState = failState;
-    //      state = StateMachine::poweredState;
+    //      state = State::POWERED;
     // }
 
     // else {
     //     do nothing, will this cause the program to hang?
     // }
+
+    // Following used for testing state machine
     ESP_LOGI(SM_TAG, "State: ONLINE");
     ESP_LOGI(SM_TAG, "Changing States");
-    currentState = nextState;
+    state = State::ARMED;
 }
 
 void StateMachine::_armedState() {
-    //Add threadsafe checking procedure
-    //Define next/fail states for clarity
-    nextState = State::Live;
-    failState = State::Powered;
-    //--------------
-
     //TODO: Find way of communicating Response from Rx thread (Global var?)
     // if (Response is received from GND control) {
-    //     currentState = nextState;
-    //      state = StateMachine::liveState;
+    //      state = State::LIVE;
     //}
     // 
     // else if (Watchdog is triggered) {
-    //     currentState = failState;
-    //      state = StateMachine::poweredState;
+    //      state = State::POWERED;
     // }
 
     // else {
@@ -103,18 +80,13 @@ void StateMachine::_armedState() {
     // }
     ESP_LOGI(SM_TAG, "State: ARMED");
     ESP_LOGI(SM_TAG, "Changing States");
-    currentState = nextState;
+    state = State::LIVE;
 }
 
 void StateMachine::_liveState() {
-    //Add threadsafe checking procedure
-    //Define next/fail states for clarity
-    // nextState = State::TestComplete;
-    // failState = State::Live;
-    // Once live state has been acheived system will no longer regress to powered state
-    // Once the burn wire has been triggered must record to the best of its abilities
-    // If system fails or is destroyed during crash, system will stay in Live state
-    //--------------
+    // Once live state has been acheived system will no longer regress to powered state on
+    // watchdog timeout. Once the burn wire has been triggered must record to the best of its 
+    // abilities. If system fails or is destroyed during crash, system will stay in Live state
 
     // start measurement threads
     //     Accelerometer
@@ -130,29 +102,23 @@ void StateMachine::_liveState() {
 
     // Sense impact (Logic to be determined)
     // After impact move to next state
-    // currentState = nextState;
     ESP_LOGI(SM_TAG, "State: LIVE");
     ESP_LOGI(SM_TAG, "Changing States");
-    currentState = State::TestComplete;
+    state = State::TESTCOMPLETE;
 }
 
 void StateMachine::_testCompleteState() {
-    //Add threadsafe checking procedure
-    //Define next/fail states for clarity
-    // nextState = State::Sleep;
-    //--------------
 
-    //Time delay make sure all relevant data is recorded
+    //Time delay make sure all relevant data is recorded (include in impact sensing logic for clarity?)
 
     //kill all sensor threads
     //log time of test completion
     //Tx test completion msg to GND station (also ensures all data has been cleared from Tx buffer)
     
     //On Rx'ing confirmation from GND
-    // currentState = nextState;
     ESP_LOGI(SM_TAG, "State: TEST COMPLETE");
     ESP_LOGI(SM_TAG, "Changing States");
-    currentState = State::Sleep;
+    state = State::SLEEP;
 }
 
 void StateMachine::_sleepState() {
@@ -163,26 +129,25 @@ void StateMachine::_sleepState() {
 
 void StateMachine::update() {
     //Switch structure to check state this will be run by the RTOS task
-    switch (currentState) {
-        case (State::Boot):         //Short hand notation will continue to Powered case since they are the same.
-        case State::Powered:
+    switch (state) {
+        case (State::BOOT):         //Short hand notation, call same function as Powered case
+        case State::POWERED:
             _poweredState();
             break;
-        case State::SystemOnline:
-            _systemOnlineState();
+        case State::ONLINE:
+            _onlineState();
             break;
-        case State::Armed:
+        case State::ARMED:
             _armedState();
             break;
-        case State::Live:
+        case State::LIVE:
             _liveState();
             break;
-        case State::TestComplete:
+        case State::TESTCOMPLETE:
             _testCompleteState();
             break;
-        case State::Sleep:
+        case State::SLEEP:
             _sleepState();
             break;
-
     }
 }

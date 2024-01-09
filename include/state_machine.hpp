@@ -1,36 +1,31 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
-// inline State currentState;
-// inline State nextState;
-// inline State failState;
+
 static const char *SM_TAG = "State_Machine";
 
 class StateMachine
 {
-//private
     enum class State {
-        Boot,
-        Powered, 
-        SystemOnline, 
-        Armed, 
-        Live, 
-        TestComplete, 
-        Sleep,
+        BOOT,
+        POWERED, 
+        ONLINE, 
+        ARMED, 
+        LIVE, 
+        TESTCOMPLETE, 
+        SLEEP,
+        DEAD,        //Testing state so while loop doesn't print infinately (should be replaced with vTaskDelete())
         };
-
-public:
-    //void (*state)();
-    State currentState;
-    State nextState;
-    State failState;
-    StateMachine();
+private:
     void _poweredState();
-    void _systemOnlineState();
+    void _onlineState();
     void _armedState();
     void _liveState();
     void _testCompleteState();
     void _sleepState();
-    void update();
+public:
+    State state;     //State may need to become a global variable is "worker threads" require state
+    StateMachine();
+    void update();  //Function that will run in loop to update state machine
 };
 #endif
