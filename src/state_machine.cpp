@@ -33,7 +33,7 @@ void StateMachine::_poweredState() {
     }
     else {
         ESP_LOGI(SM_TAG, "Changing States");
-        state = State::POWERED;
+        state = State::CONFIGURED;
     }
 }
 
@@ -104,7 +104,7 @@ void StateMachine::_liveState() {
     // After impact move to next state
     ESP_LOGI(SM_TAG, "State: LIVE");
     ESP_LOGI(SM_TAG, "Changing States");
-    state = State::TESTCOMPLETE;
+    state = State::COMPLETE;
 }
 
 void StateMachine::_testCompleteState() {
@@ -131,7 +131,7 @@ void StateMachine::update() {
     //Switch structure to check state this will be run by the RTOS task
     switch (state) {
         case (State::BOOT):         //Short hand notation, call same function as Powered case
-        case State::POWERED:
+        case State::CONFIGURED:
             _poweredState();
             break;
         case State::ONLINE:
@@ -143,7 +143,7 @@ void StateMachine::update() {
         case State::LIVE:
             _liveState();
             break;
-        case State::TESTCOMPLETE:
+        case State::COMPLETE:
             _testCompleteState();
             break;
         case State::SLEEP:

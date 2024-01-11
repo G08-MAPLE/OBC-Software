@@ -8,11 +8,11 @@ class StateMachine
 {
     enum class State {
         BOOT,
-        POWERED, 
+        CONFIGURED, 
         ONLINE, 
         ARMED, 
         LIVE, 
-        TESTCOMPLETE, 
+        COMPLETE, 
         SLEEP,
         DEAD,        //Testing state so while loop doesn't print infinately (should be replaced with vTaskDelete())
         };
