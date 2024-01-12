@@ -1,10 +1,13 @@
 #include "startup.hpp"
-#include "state_machine.hpp"
+#include "main.hpp"
+// #include "state_machine.hpp"
 
 void startup(void * param){
-    StateMachine dartStateMachine;
+    // StateMachine dartStateMachine;
 
     for(;;){
-       //dartStateMachine.update(); 
+        if (state == State::BOOT) {
+            
+        }
     }
 }
