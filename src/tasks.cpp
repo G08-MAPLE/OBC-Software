@@ -1,5 +1,5 @@
 #include "tasks.hpp"
-#include <Arduino.h>
+#include "main.hpp"
 
 void startTasks(){
     xTaskCreate(

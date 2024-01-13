@@ -61,14 +61,14 @@ void UARTController::config(void){
 // The following two functions have been taken from the ESP-IDF example pages
 // Example code found: https://github.com/espressif/esp-idf/blob/v5.1.2/examples/peripherals/uart/uart_async_rxtxtasks/main/uart_async_rxtxtasks_main.c
 
-int _sendData(const char* logName, const char* data) {
+int UARTController::_sendData(const char* logName, const char* data) {
     const int len = strlen(data);
     const int txBytes = uart_write_bytes(UART_NUM_2, data, len);
     ESP_LOGI(logName, "Wrote %d bytes", txBytes);
     return txBytes;
 }
 
-void XBEE_tx(void * param) {
+void UARTController::XBEE_tx() {
         _sendData(UARTController::TAG, "DART to GND_CONTROL\n");
         // vTaskDelay(4000 / portTICK_PERIOD_MS);                      //This is default message rate
         // TODO look into messaging rates to maximized data collection

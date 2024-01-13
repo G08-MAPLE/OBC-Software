@@ -13,6 +13,7 @@ public:
 
     UARTController();
     void config(void);
+    void XBEE_tx();
 };
 
 #endif
