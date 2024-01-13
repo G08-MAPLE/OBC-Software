@@ -1,16 +1,19 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "startup.hpp"
+#include "uart.hpp"
 
 void startup(void * param){
-    TickType_t blockOnceSecond = pdMS_TO_TICKS(1000);
+    /* This task will run when the controller initially turns on. It will configure all peripherals needed
+    for the project to operate. Once the peripherals have been configured state will be changed from BOOT
+    to CONFIGURED and this task will suspend itself since it is only needed once per "life cycle".*/
 
-    // UARTController xBeeRadio;
-    // xBeeRadio.config();
-
+    UARTController xBeeRadio;       //This object will need to be passed to other tasks in order to access UART? Global (extern)?
+    
     for(;;){
         if (state == State::BOOT) {
-            // xBeeRadio.XBEE_tx();
+            xBeeRadio.config();
+            ESP_LOGI(START_TAG, "UART Controller created");
             ESP_LOGI(START_TAG, "Changing States");
             if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
                 state = State::ARMED;
@@ -20,12 +23,13 @@ void startup(void * param){
             else {
                 ESP_LOGE(START_TAG, "Could not obtain mutex before timeout");
             }
-
         }
 
         else {
-            vTaskDelay(blockOnceSecond);
             ESP_LOGI(START_TAG, "State is not in BOOT");
+            // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to scheduler
+            // will need to call vTaskResume(startup) in order for this task to be accessible again.
+            vTaskSuspend(NULL);     // passing NULL will suspend calling task
         }
     }
 }

@@ -5,7 +5,7 @@ void startTasks(){
     xTaskCreate(
         startup,      // Function that should be called
         "startup",   // Name of the task (for debugging)
-        2000,            // Stack size (bytes)
+        3000,            // Stack size (bytes)
         NULL,            // Parameter to pass
         1,               // Task priority
         NULL             // Task handle
