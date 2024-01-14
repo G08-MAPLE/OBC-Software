@@ -3,6 +3,4 @@
 cmake_minimum_required(VERSION 3.5)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake) 
-# 
-# C:/Users/Svan/.platformio/packages/framework-espidf
 project(OBC-Software)

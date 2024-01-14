@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "main.hpp"
 #include "tasks.hpp"
+#include "spiffs.hpp"
 #include "uart.hpp"
 
 static const char *START_TAG = "Start";
