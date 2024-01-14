@@ -13,7 +13,6 @@ class Filesys {
 public:
 //TODO: Need to make better functions for reading and writing to an already existing file
 //TODO: Need to make sure functions are thread safe
-    esp_vfs_spiffs_conf_t conf;
     Filesys();                                      //Class constructor esp_err_t
     esp_err_t config();                             //Set SPIFFS configuration
     void partitionSizeCheck(esp_err_t partition);   //Check if partitions are valid sizes
@@ -25,7 +24,7 @@ public:
     void closeFileSys();                            //Close and disable SPIFFS
 
 private:
-    // _partitionLabel;
+    esp_vfs_spiffs_conf_t conf;                     //Let other class methods access config params, hide from rest of program
     void _verifyPartitionSize(size_t sizeT, size_t usedT);
 };
 

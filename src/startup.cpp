@@ -15,6 +15,7 @@ void startup(void * param){
 
     UARTController xBeeRadio;       //This object will need to be passed to other tasks in order to access UART? Global (extern)?
     Filesys dartFs;                  //This object will also be needed in other tasks unless it becomes its own task? (still need config)
+    // TODO: Create and initialize Accelerometer object
     
     for(;;){
         if (state == State::BOOT) {
