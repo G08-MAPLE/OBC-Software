@@ -5,7 +5,7 @@
 #include "burnwire.hpp"
 #include "heartbeat.hpp"
 #include "startup.hpp"
-#include "state_machine.hpp"
+#include "systemsummary.hpp"
 #include "XBEE.hpp"
 
 void startTasks();

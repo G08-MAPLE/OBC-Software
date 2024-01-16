@@ -19,20 +19,21 @@ void startup(void * param){
     // TODO: Create and initialize Accelerometer object this might just be the I2C bus
     
     for(;;){
+        // !!!Must be paired with xTaskResumeAll() or else no other tasks will be able to run
+        // Should probably just call startup function from main and do away with its task-ness
         if (state == State::BOOT) {
+            // Initialize SPIFFS filesystem (fs)
             dartFs.config();
-            // dartFs.createFile();
-            // dartFs.findFile();
-            // dartFs.renameFile();
-            // dartFs.readFile();
-            // dartFs.closeFileSys();
-            
+            // Initialize Radio comms. (UART)
             xBeeRadio.config();
             ESP_LOGI(START_TAG, "UART Controller created");
+            // TODO: Initialize sensors and I2C bus 
+
+
             ESP_LOGI(START_TAG, "Changing States");
             if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                state = State::ARMED;
-                ESP_LOGI(START_TAG, "State changed to ARMED");
+                state = State::COMPLETE;
+                ESP_LOGI(START_TAG, "State changed to CONFIGURED");
                 xSemaphoreGive(stateMutex);
             }
             else {
@@ -42,8 +43,8 @@ void startup(void * param){
 
         else {
             ESP_LOGI(START_TAG, "State is not in BOOT");
-            // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to scheduler
-            // will need to call vTaskResume(startup) in order for this task to be accessible again.
+            // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to 
+            // scheduler will need to call vTaskResume(startup) in order for this task to be accessible again.
             vTaskSuspend(NULL);     // passing NULL will suspend calling task
         }
     }

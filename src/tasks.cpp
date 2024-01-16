@@ -7,6 +7,15 @@ void startTasks(){
         "startup",   // Name of the task (for debugging)
         3000,            // Stack size (bytes)
         NULL,            // Parameter to pass
+        2,               // Task priority  Should be high because needs to be the first task to execute
+        NULL             // Task handle
+    );
+
+    xTaskCreate(
+        systemSummary,      // Function that should be called
+        "systemSummary",   // Name of the task (for debugging)
+        2000,            // Stack size (bytes)
+        NULL,            // Parameter to pass
         1,               // Task priority
         NULL             // Task handle
     );
