@@ -10,22 +10,22 @@ void startup(void * param){
         - Filesystem: For logging
         - Sensors (Accelerometer): For data collection
         - UART: To Rx commands and Tx data
+        - I2C: Connection to sensors such as Accelerometer
     Once the peripherals have been configured state will be changed from BOOT
     to CONFIGURED and this task will suspend itself since it is only needed once per "life cycle".*/
 
     UARTController xBeeRadio;       //This object will need to be passed to other tasks in order to access UART? Global (extern)?
     Filesys dartFs;                  //This object will also be needed in other tasks unless it becomes its own task? (still need config)
-    // TODO: Create and initialize Accelerometer object
+    // TODO: Create and initialize Accelerometer object this might just be the I2C bus
     
     for(;;){
         if (state == State::BOOT) {
-            esp_err_t error = dartFs.config();
-            dartFs.partitionSizeCheck(error);
-            dartFs.createFile();
-            dartFs.findFile();
-            dartFs.renameFile();
-            dartFs.readFile();
-            dartFs.closeFileSys();
+            dartFs.config();
+            // dartFs.createFile();
+            // dartFs.findFile();
+            // dartFs.renameFile();
+            // dartFs.readFile();
+            // dartFs.closeFileSys();
             
             xBeeRadio.config();
             ESP_LOGI(START_TAG, "UART Controller created");

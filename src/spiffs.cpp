@@ -12,7 +12,12 @@ Filesys::Filesys() {
   ESP_LOGI(SPIFFS_TAG, "SPIFFS object created");
 }
 
- esp_err_t Filesys::config() {
+ void Filesys::config() {
+    /* This function will initialize the SPIFFS filesystem. Once the filesystem has been configured it will check that the 
+    desired partition is valid for the size of the system using the _partitionCheck() function. It will then verify the size
+    of the partition is consisten using the _verifyPartitionSize() function. Nesting these functions makes initializing the
+    filesystem simpler since it can be configured in line of code.*/
+
     //program was did not like conf being a variable, threw a fit on boot
   esp_vfs_spiffs_conf_t conf = {
     .base_path = "/spiffs",
@@ -25,7 +30,6 @@ Filesys::Filesys() {
 
   // Use settings defined above to initialize and mount SPIFFS filesystem.
   // Note: esp_vfs_spiffs_register is an all-in-one convenience function.
-
   esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
   if (ret != ESP_OK) {
@@ -36,10 +40,10 @@ Filesys::Filesys() {
       } else {
           ESP_LOGE(SPIFFS_TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
       }
-      return ret;
+      return;
   }
 
-//   I don't totally understand what this is doing, but it was in the example program so I'll keep it for now
+// I don't totally understand what this is doing, but it was in the example program so I'll keep it for now
   #ifdef CONFIG_EXAMPLE_SPIFFS_CHECK_ON_START
     ESP_LOGI(SPIFFS_TAG, "Performing SPIFFS_check().");
     ret = esp_spiffs_check(_conf.partition_label);
@@ -50,10 +54,13 @@ Filesys::Filesys() {
         ESP_LOGI(SPIFFS_TAG, "SPIFFS_check() successful");
     }
   #endif
-    return ret;
+    _partitionSizeCheck(ret);
+    return;
 }
 
-void Filesys::partitionSizeCheck(esp_err_t partition) {
+void Filesys::_partitionSizeCheck(esp_err_t partition) {
+    /* This function will check to make sure the requested partition size is less than the available memory size.*/
+
     size_t total = 0, used = 0;
     partition = esp_spiffs_info(conf.partition_label, &total, &used);
     if (partition != ESP_OK) {
@@ -68,6 +75,7 @@ void Filesys::partitionSizeCheck(esp_err_t partition) {
 
 void Filesys::_verifyPartitionSize(size_t sizeT, size_t usedT) {
     // Check consistency of reported partiton size info. Requires total size of partition and used size of memory.
+    
     if (usedT > sizeT) {
         ESP_LOGW(SPIFFS_TAG, "Number of used bytes cannot be larger than total. Performing SPIFFS_check().");
         //reuses prior variable name, but should be fine based on scope of function
