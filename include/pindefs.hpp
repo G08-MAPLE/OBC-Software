@@ -2,7 +2,7 @@
 #define PINDEFS_H
 
 //State Control
-#define PIN_BURN_WIRE 32
+#define PIN_BURN_WIRE GPIO_NUM_32
 #define PIN_MCU_KILL 33
 
 //Accelerometer I2C Bus
