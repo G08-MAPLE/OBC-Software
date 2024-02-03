@@ -9,11 +9,15 @@ class UARTController {
 private:
     // static const int RX_BUF_SIZE = 1024;
     int _sendData(const char* logName, const char* data);
+    void _parseData(uint8_t* data);
 
 public:
     UARTController();
-    void config(void);
-    void XBEE_tx();
+    void config();
+    void XBEE_tx(const char* dataTx);
+    void XBEE_rx();
 };
+
+
 
 #endif

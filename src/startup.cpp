@@ -1,7 +1,6 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "startup.hpp"
-#include "uart.hpp"
 
 void startup(void * param){
     /* This task will run when the controller initially turns on. It will configure all peripherals needed
@@ -32,7 +31,7 @@ void startup(void * param){
 
             ESP_LOGI(START_TAG, "Changing States");
             if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                state = State::COMPLETE;
+                state = State::CONFIGURED;
                 ESP_LOGI(START_TAG, "State changed to CONFIGURED");
                 xSemaphoreGive(stateMutex);
             }
@@ -45,7 +44,12 @@ void startup(void * param){
             ESP_LOGI(START_TAG, "State is not in BOOT");
             // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to 
             // scheduler will need to call vTaskResume(startup) in order for this task to be accessible again.
-            vTaskSuspend(NULL);     // passing NULL will suspend calling task
+            char data[] = "XBee Tx Test";
+            // xBeeRadio.XBEE_tx(data);
+            // vTaskDelay(pdMS_TO_TICKS(3000)); 
+            // xBeeRadio.XBEE_rx();
+            // vTaskDelay(pdMS_TO_TICKS(3000));
+            // vTaskSuspend(NULL);     // passing NULL will suspend calling task
         }
     }
 }

@@ -74,8 +74,24 @@ int UARTController::_sendData(const char* logName, const char* data) {
     return txBytes;
 }
 
-void UARTController::XBEE_tx() {
-        _sendData(UART_TAG, "DART to GND_CONTROL\n");
+void UARTController::XBEE_tx(const char* dataTx) {
+        _sendData(UART_TAG, dataTx);
         // vTaskDelay(4000 / portTICK_PERIOD_MS);                      //This is default message rate
         // TODO look into messaging rates to maximized data collection
+}
+
+void UARTController::XBEE_rx() {
+    uint8_t* data = (uint8_t*) malloc(RX_BUF_SIZE+1);
+    const int rxBytes = uart_read_bytes(UART_NUM_2, data, RX_BUF_SIZE, 1000 / portTICK_PERIOD_MS);
+        if (rxBytes > 0) {
+            data[rxBytes] = 0;
+            ESP_LOGI(UART_TAG, "Read %d bytes: '%s'", rxBytes, data);
+            ESP_LOG_BUFFER_HEXDUMP(UART_TAG, data, rxBytes, ESP_LOG_INFO);
+            // Parse data
+            // Depending on message call different functions
+        }
+}
+
+void UARTController::_parseData(uint8_t* data) {
+    
 }

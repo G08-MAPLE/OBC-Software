@@ -47,6 +47,10 @@ void systemSummary(void * param) {
                     ESP_LOGE(SUMMARY_TAG, "Could not obtain mutex before timeout");
                 }
             }
+            else {
+                //Track number of tests that failed
+                //printSysSummary
+            }
 
         }
         else {
@@ -55,7 +59,10 @@ void systemSummary(void * param) {
         }
     }
 }
-
+// Create a systemTest class that will contain all functions
+// each test can have a variable that contains info about test status
+// If all in a class will have access to this info from printSysSummary()
+// Thus always call printSysSummary() whenever this task runs
 int testFileCreation() { 
     //Create a test file
     // See spiffs.c for example
@@ -101,5 +108,7 @@ int testXBeeUartLink() {
 }
 
 void printSysSummary() {
-
+    /* Log test info to class variables during tests
+    This function will print out the system status to a file/memory
+    Should handle all cases both pass and fail*/
 }
