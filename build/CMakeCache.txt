@@ -241,6 +241,7 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+<<<<<<< HEAD
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
@@ -250,6 +251,8 @@ IDF_TARGET:STRING=esp32
 //IDF Build Toolchain Type
 IDF_TOOLCHAIN:STRING=gcc
 
+=======
+>>>>>>> aa4e39981ce3e75c9e7162e52c86f740ef84cda3
 //Value Computed by CMake
 OBC-Software_BINARY_DIR:STATIC=C:/Users/Svan/Software_Projects/OBC-Software/build
 
@@ -259,6 +262,7 @@ OBC-Software_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 OBC-Software_SOURCE_DIR:STATIC=C:/Users/Svan/Software_Projects/OBC-Software
 
+<<<<<<< HEAD
 //Value Computed by CMake
 Project_BINARY_DIR:STATIC=C:/Users/Svan/Software_Projects/OBC-Software/build
 
@@ -268,6 +272,8 @@ Project_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=C:/Users/Svan/Software_Projects/OBC-Software
 
+=======
+>>>>>>> aa4e39981ce3e75c9e7162e52c86f740ef84cda3
 
 ########################
 # INTERNAL cache entries
@@ -431,10 +437,13 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_TAPI-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+<<<<<<< HEAD
 //Details about finding Git
 FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Program Files/Git/cmd/git.exe][v2.43.0.windows.1()]
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
+=======
+>>>>>>> aa4e39981ce3e75c9e7162e52c86f740ef84cda3
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 

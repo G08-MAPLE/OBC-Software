@@ -4,6 +4,9 @@
 #include "esp_err.h"
 #include "esp_spiffs.h"
 #include "main.hpp"
+#include "UART_config.hpp"
+
+static const char *TAG = "MAIN";
 
 #include <Arduino.h>
 #include <iostream>
@@ -31,9 +34,11 @@ void setup() {
 }
 
 //runs in an infinite while loop (not really needed because of RTOS)
-void loop() {
-  
-}
+//Will not compile if removed
+  void loop() {
+    
+  }
+
 
 
 
