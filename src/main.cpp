@@ -8,15 +8,6 @@
 
 static const char *TAG = "MAIN";
 
-#include <Arduino.h>
-#include <iostream>
-#include <stdio.h>
-#include <string.h>
-#include <sys/unistd.h>
-#include <sys/stat.h>
-
-static const char *TAG = "MAIN";
-
 //Create Mutexes to ensure resources are used safely
 SemaphoreHandle_t stateMutex = xSemaphoreCreateMutex();       //State Mutex
 SemaphoreHandle_t flashMemMutex = xSemaphoreCreateMutex();    //Memory Mutex
@@ -38,9 +29,3 @@ void setup() {
   void loop() {
     
   }
-
-
-
-
-
-

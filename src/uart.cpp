@@ -90,6 +90,7 @@ void UARTController::XBEE_rx() {
             // Parse data
             // Depending on message call different functions
         }
+    free(data); // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
 }
 
 void UARTController::_parseData(uint8_t* data) {
