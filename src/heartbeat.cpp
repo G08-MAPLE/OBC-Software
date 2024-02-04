@@ -14,14 +14,6 @@ int get_misses(){
     return misses;
 }
 
-void increment_misses(){
-    misses++;
-}
-
-void clear_misses(){
-    misses = 0;
-}
-
 void heartbeat(void * param){
     BaseType_t retRTOS;
     xbee_state = CONN_NONE;
@@ -64,7 +56,7 @@ void heartbeat(void * param){
 				else{
 					//lost ground computer
 					xbee_state = CONN_LOST;
-					logMessage("Heartbeat: Lost Connection with ground computer", true);
+					//Log(XBEE: Lost connection to the ground computer)
 				}
 			}
 			else if(xbee_state == CONN_NONE ){
@@ -79,7 +71,7 @@ void heartbeat(void * param){
 				else{
 					//lost ground computer
 					xbee_state = CONN_NONE;
-					logMessage("Heartbeat: Could not connect with ground computer", true);
+					//Log(could not connect to ground computer)
 				}
 			}
 			else{
