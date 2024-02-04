@@ -3,6 +3,9 @@
 #include "freertos/FreeRTOS.h"
 #include "heartbeat.hpp"
 
+//TODO: set up notifying task from xbee rx task
+//TODO: set up logging api and incorporate here
+
 static conn_state_t xbee_state;
 static int misses;
 
