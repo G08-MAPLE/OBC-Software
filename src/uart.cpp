@@ -1,5 +1,6 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE //Defined before esp_log.h as per espressif docs
 
+#include "digimesh_msg.hpp"
 #include "driver/gpio.h"
 #include "driver/uart.h"
 #include "esp_log.h"
@@ -7,6 +8,8 @@
 #include "pindefs.hpp"
 #include "string.h"
 #include "uart.hpp"
+
+// #include <iostream>
 
 /**
  * This class will contain all of the functions necessary to create a UART driver required to interface with an
@@ -80,6 +83,18 @@ void UARTController::XBEE_tx(const char* dataTx) {
         // TODO look into messaging rates to maximized data collection
 }
 
+void UARTController::XBEE_digi_tx() {
+    uint16_t hex_data[] = {0x7E, 0x00, 0x1E, 0x10, 0x01, 0x00, 0x13, 0xA2, 0x00, 0x41, 0x5B, 0xAD, 0x65, 0xFF, 0xFE, 0x00, 0x00,
+                          0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x66, 0x72, 0x6F, 0x6D, 0x20, 0x44, 0x41, 0x52, 0x54, 0x21, 0x5A};
+
+    uint16_t hex_data1[] = {0x5A, 0x21, 0x54, 0x52, 0x41, 0x44, 0x20, 0x6D, 0x6F, 0x72, 0x66, 0x20, 0x6F, 0x6C, 0x6C, 0x65, 0x48,
+                           0x00, 0x00, 0xFE, 0xFF, 0x65, 0xAD, 0x5B, 0x41, 0x00, 0xA2, 0x13, 0x00, 0x01, 0x10, 0x1E, 0x00, 0x7E};
+
+    int data_len = sizeof(hex_data1);
+    const int txBytes = uart_write_bytes(UART_NUM_2, hex_data1, data_len);
+    ESP_LOGI(UART_TAG, "Wrote %d bytes", txBytes);
+}
+
 void UARTController::XBEE_rx() {
     uint8_t* data = (uint8_t*) malloc(RX_BUF_SIZE+1);
     const int rxBytes = uart_read_bytes(UART_NUM_2, data, RX_BUF_SIZE, 1000 / portTICK_PERIOD_MS);
@@ -87,12 +102,31 @@ void UARTController::XBEE_rx() {
             data[rxBytes] = 0;
             ESP_LOGI(UART_TAG, "Read %d bytes: '%s'", rxBytes, data);
             ESP_LOG_BUFFER_HEXDUMP(UART_TAG, data, rxBytes, ESP_LOG_INFO);
-            // Parse data
-            // Depending on message call different functions
+            // Parse incoming data
+            _parseData(data);
         }
     free(data); // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
 }
 
 void UARTController::_parseData(uint8_t* data) {
+    int buffIdx = 0;
+    uint8_t startDelimiter = data[0];   // Use uint8_t since it matches example which is working
     
+    if (startDelimiter == 0x7E) {       // The start delimiter of a Digimesh message is always 7E
+        Digimesh_msg currentMsg = Digimesh_msg(data);
+        currentMsg.digimesh_parse(data, buffIdx);
+        // Depending on message call different functions
+        // Increment buffIdx based on bytes read
+
+        // want to clear the bytes from the buffer once they have been read
+    }
+
+    else if (startDelimiter == 0) { 
+        // End of buffer end function???
+    }
+
+    else {
+        buffIdx++; //Increase buffer index to try to find next message
+    }
+   
 }
