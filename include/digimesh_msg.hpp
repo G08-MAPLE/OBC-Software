@@ -20,11 +20,14 @@ private:
     uint8_t _senderAddr[8];                                         // 64-bit address of sender, 8 bytes (Serial Number)
     uint8_t _shortAddr[2];                                          // 16-bit address (I don't really know what this does yet)
     int _rxOptions;                                                 // Don't really know what this does either
-    uint8_t* _rfData;                                                 // Data embedded in the frame
+    uint8_t* _rfData;                                               // Data embedded in the frame
     uint8_t _msgChecksum;                                           // Checksum sent with msg
     
     int _ogBuffIdx;                                                 // Original idx of the Rx buffer
     int _modBuffIdx;                                                // Modified version of the Rx buffer idx
+    const int _sizeSendAddr = 8;                                    // Size in bytes of sender address array
+    const int _sizeShortAddr = 2;                                   // Size in bytes of short address arry
+    int _dataSize;                                                  // Size in bytes of data in frame
 
     // Methods
     void _extractStartDelimiter(uint8_t* data, int buffIdx);
@@ -35,6 +38,7 @@ private:
     void _extractRxOption(uint8_t* dataFrame);
     void _extractRfData(uint8_t* dataFrame);
     void _extractChecksum(uint8_t* dataFrame);
+    int _verifyChecksum();
 
 public:
     // Digimesh_msg();                                                  // Constructor for msg creation

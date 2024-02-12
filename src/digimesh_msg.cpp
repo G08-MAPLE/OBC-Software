@@ -16,6 +16,7 @@ int Digimesh_msg::digimesh_parse(uint8_t* dataFrame, int rxBuffIdx) {
     _extractRxOption(dataFrame);
     _extractRfData(dataFrame);
     _extractChecksum(dataFrame);
+    _verifyChecksum();
     return _modBuffIdx;
 }
 
@@ -106,16 +107,16 @@ void Digimesh_msg::_extractRfData(uint8_t* dataFrame) {
     // data(bytes) = msg size (bytes) - type (byte) - src addr (8 bytes) - sm. addr (2 bytes) - rx option (byte)
     // Simplifies to data(bytes) = msg size - 12 [bytes]
     const int overHeadBytes = 12;
-    const int dataSize = _msgLength - overHeadBytes;
-    uint8_t* _rfData = (uint8_t*) malloc(dataSize+1);
+    _dataSize = _msgLength - overHeadBytes;
+    _rfData = (uint8_t*) malloc(_dataSize+1);
 
-    for( int i=0; i<(dataSize); i++) {
+    for( int i=0; i<(_dataSize); i++) {
         _rfData[i] = dataFrame[_modBuffIdx];
         _modBuffIdx++;
     }
 
     // Use for debugging
-    ESP_LOG_BUFFER_HEXDUMP(DIGIMESH_TAG, _rfData, dataSize, ESP_LOG_INFO);
+    ESP_LOG_BUFFER_HEXDUMP(DIGIMESH_TAG, _rfData, _dataSize, ESP_LOG_INFO);
     /* Note this may need to be optimized if we are trying to maximize communication throughput. */
 }
 
@@ -127,4 +128,39 @@ void Digimesh_msg::_extractChecksum(uint8_t* dataFrame) {
 
     // Use for debugging
     ESP_LOGI(DIGIMESH_TAG, "Checksum: %02X", _msgChecksum);
+}
+
+int Digimesh_msg::_verifyChecksum() {
+    /* This function will verify data integrity of a frame by verifying its checksum. */
+    int frameSum = 0;
+    frameSum += _msgType;
+    
+    for (int i=0; i<_sizeSendAddr; i++) {
+        frameSum += _senderAddr[i];
+    }
+    
+    for (int x=0; x< _sizeShortAddr; x++) {
+        frameSum += _shortAddr[x];
+    }
+    
+    frameSum += _rxOptions;
+    
+    for (int y=0; y<_dataSize; y++) {
+        frameSum += _rfData[y];
+    }
+
+    frameSum += _msgChecksum;
+    // Cast to uint8_t because we only care about the least significant 8 bits (defined in XBee manual)
+    frameSum = (uint8_t) frameSum; 
+
+    if (frameSum == 0xFF) {
+        // The sum of a correctly transmitted frame should be equal to 0xFF
+        ESP_LOGI(DIGIMESH_TAG, "Frame Checksum is Correct.");
+        return 1;
+    }
+    else {
+        ESP_LOGI(DIGIMESH_TAG, "Frame Checksum is Incorrect.");
+        ESP_LOGI(DIGIMESH_TAG, "Calculated Checksum: %X", frameSum);
+        return -1;
+    }
 }
