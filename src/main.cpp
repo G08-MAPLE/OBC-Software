@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <stdio.h>
+#include <Wire.h>
 #include "main.hpp"
 #include "UART_config.hpp"
 #include "esp_log.h"
@@ -16,6 +17,11 @@ void setup() {
   UART_config();
 
   ESP_LOGI(TAG, "UART configured successfully");
+
+  //Begin I2C for accelerometer
+  if(Wire.begin()) ESP_LOGI(TAG, "I2C Started Successfully");
+  else ESP_LOGI(TAG, "I2C Failed");
+
   startTasks();
 }
 
