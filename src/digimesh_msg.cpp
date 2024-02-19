@@ -11,12 +11,27 @@ int Digimesh_msg::digimesh_parse(uint8_t* dataFrame, int rxBuffIdx) {
     _extractStartDelimiter(dataFrame, rxBuffIdx);
     _extractMsgLength(dataFrame);
     _extractFrameType(dataFrame);
-    _extractSenderAddress(dataFrame);
-    _extractShortAddress(dataFrame);
-    _extractRxOption(dataFrame);
-    _extractRfData(dataFrame);
-    _extractChecksum(dataFrame);
-    _verifyChecksum();
+    if (_msgType == 0x90) {
+        _extractSenderAddress(dataFrame);
+        _extractShortAddress(dataFrame);
+        _extractRxOption(dataFrame);
+        _extractRfData(dataFrame);
+        _extractChecksum(dataFrame);
+        _verifyChecksum();
+    }
+
+    else if (_msgType == 0x89) {
+        ESP_LOGI(DIGIMESH_TAG, "Transmit Status Received");
+        _extractFrameId(dataFrame);
+        _extractDeliveryStatus(dataFrame);
+        _extractChecksum(dataFrame);
+        _verifyChecksum();
+    }
+
+    else {
+        ESP_LOGI(DIGIMESH_TAG, "Unexpected frame type received");
+    }
+    
     return _modBuffIdx;
 }
 
@@ -163,4 +178,20 @@ int Digimesh_msg::_verifyChecksum() {
         ESP_LOGI(DIGIMESH_TAG, "Calculated Checksum: %X", frameSum);
         return -1;
     }
+}
+
+void Digimesh_msg::_extractFrameId(uint8_t* dataFrame) {
+    /* This method will extract the Frame Id from the Digimesh frame. */
+    _frameId = dataFrame[_modBuffIdx];
+    _modBuffIdx++;
+
+    ESP_LOGI(DIGIMESH_TAG, "Frame ID: %02X", _frameId);
+}
+
+void Digimesh_msg::_extractDeliveryStatus(uint8_t* dataFrame) {
+    /* This method will extract the Delivery status from the Digimesh frame. */
+    _deliveryStatus = dataFrame[_modBuffIdx];
+    _modBuffIdx++;
+
+    ESP_LOGI(DIGIMESH_TAG, "Delivery Status: %02X", _deliveryStatus);
 }

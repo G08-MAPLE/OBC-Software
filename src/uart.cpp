@@ -90,8 +90,8 @@ void UARTController::XBEE_digi_tx() {
     uint16_t hex_data1[] = {0x5A, 0x21, 0x54, 0x52, 0x41, 0x44, 0x20, 0x6D, 0x6F, 0x72, 0x66, 0x20, 0x6F, 0x6C, 0x6C, 0x65, 0x48,
                            0x00, 0x00, 0xFE, 0xFF, 0x65, 0xAD, 0x5B, 0x41, 0x00, 0xA2, 0x13, 0x00, 0x01, 0x10, 0x1E, 0x00, 0x7E};
 
-    int data_len = sizeof(hex_data1);
-    const int txBytes = uart_write_bytes(UART_NUM_2, hex_data1, data_len);
+    int data_len = sizeof(hex_data);
+    const int txBytes = uart_write_bytes(UART_NUM_2, hex_data, data_len);
     ESP_LOGI(UART_TAG, "Wrote %d bytes", txBytes);
 }
 
@@ -105,6 +105,9 @@ void UARTController::XBEE_rx() {
             // Parse incoming data
             _parseData(data);
         }
+        else {
+            ESP_LOGI(UART_TAG, "UART Rx buffer is empty.");
+        }
     free(data); // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
 }
 
@@ -112,21 +115,24 @@ void UARTController::_parseData(uint8_t* data) {
     int buffIdx = 0;
     uint8_t startDelimiter = data[0];   // Use uint8_t since it matches example which is working
     
-    if (startDelimiter == 0x7E) {       // The start delimiter of a Digimesh message is always 7E
-        Digimesh_msg currentMsg = Digimesh_msg(data);
-        currentMsg.digimesh_parse(data, buffIdx);
-        // Depending on message call different functions
-        // Increment buffIdx based on bytes read
+    while (data[buffIdx] != 0) {
+        if (startDelimiter == 0x7E) {       // The start delimiter of a Digimesh message is always 7E
+            Digimesh_msg currentMsg = Digimesh_msg(data);
+            buffIdx = currentMsg.digimesh_parse(data, buffIdx);
+            // Depending on message call different functions
+
 
         // want to clear the bytes from the buffer once they have been read
-    }
+        }
 
-    else if (startDelimiter == 0) { 
-        // End of buffer end function???
-    }
+        else if (startDelimiter == 0) { 
+            // End of buffer, end function???
+        }
 
-    else {
-        buffIdx++; //Increase buffer index to try to find next message
+        else {
+            ESP_LOGI(UART_TAG, "Current Data %02X", data[buffIdx]);
+            buffIdx++; //Increase buffer index to try to find next message
+        }
     }
-   
+    ESP_LOGI(UART_TAG, "OUTSIDE OF FOR LOOP");
 }

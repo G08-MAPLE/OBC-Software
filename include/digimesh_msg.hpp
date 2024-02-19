@@ -22,6 +22,9 @@ private:
     int _rxOptions;                                                 // Don't really know what this does either
     uint8_t* _rfData;                                               // Data embedded in the frame
     uint8_t _msgChecksum;                                           // Checksum sent with msg
+
+    uint8_t _frameId;                                               // Frame ID for Tx'd message
+    uint8_t _deliveryStatus;                                        // Delivery status of Tx'd message
     
     int _ogBuffIdx;                                                 // Original idx of the Rx buffer
     int _modBuffIdx;                                                // Modified version of the Rx buffer idx
@@ -39,6 +42,9 @@ private:
     void _extractRfData(uint8_t* dataFrame);
     void _extractChecksum(uint8_t* dataFrame);
     int _verifyChecksum();
+
+    void _extractFrameId(uint8_t* dataFrame);
+    void _extractDeliveryStatus(uint8_t* dataFrame);
 
 public:
     // Digimesh_msg();                                                  // Constructor for msg creation
