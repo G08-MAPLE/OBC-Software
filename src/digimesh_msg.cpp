@@ -195,3 +195,11 @@ void Digimesh_msg::_extractDeliveryStatus(uint8_t* dataFrame) {
 
     ESP_LOGI(DIGIMESH_TAG, "Delivery Status: %02X", _deliveryStatus);
 }
+
+uint8_t* Digimesh_msg::get_rfData() {
+    return _rfData;
+}
+
+int Digimesh_msg::get_dataSize() {
+    return _dataSize;
+}

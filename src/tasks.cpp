@@ -29,14 +29,14 @@ void startTasks(){
     //     NULL             // Task handle
     // );
 
-    // xTaskCreate(
-    //     burn_manager,      // Function that should be called
-    //     "burn manager",   // Name of the task (for debugging)
-    //     1000,            // Stack size (bytes)
-    //     NULL,            // Parameter to pass
-    //     1,               // Task priority
-    //     NULL             // Task handle
-    // );
+    xTaskCreate(
+        burn_manager,      // Function that should be called
+        "burn manager",   // Name of the task (for debugging)
+        1000,            // Stack size (bytes)
+        NULL,            // Parameter to pass
+        1,               // Task priority
+        NULL             // Task handle
+    );
 
     // xTaskCreate(
     //     systemSummary,      // Function that should be called

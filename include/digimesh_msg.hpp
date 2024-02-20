@@ -50,6 +50,8 @@ public:
     // Digimesh_msg();                                                  // Constructor for msg creation
     Digimesh_msg(uint8_t* data);                                        // Constructor for msg reading
     int digimesh_parse(uint8_t* dataFrame, int rxBuffIdx);
+    uint8_t* get_rfData();
+    int get_dataSize();
 };
 
 #endif

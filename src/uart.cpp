@@ -9,8 +9,6 @@
 #include "string.h"
 #include "uart.hpp"
 
-// #include <iostream>
-
 /**
  * This class will contain all of the functions necessary to create a UART driver required to interface with an
  * XBee radio. Hardware flow control is turned off. It does not use UART driver event queue.
@@ -28,9 +26,13 @@
 
 #define UART_BAUD_RATE     115200
 #define UART_STACK_SIZE    2048
-// #define RX_BUF_SIZE        (1024)
+
 static const int RX_BUF_SIZE = 1024;
 
+uint8_t strt_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x72, 0x74};
+uint8_t burn_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x62, 0x75, 0x72, 0x6E};
+uint8_t stop_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x6F, 0x70};
+uint8_t hrtb_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x68, 0x72, 0x74, 0x62};
 
 UARTController::UARTController(){
     // const int RX_BUF_SIZE = 1024;
@@ -108,20 +110,69 @@ void UARTController::XBEE_rx() {
         else {
             ESP_LOGI(UART_TAG, "UART Rx buffer is empty.");
         }
-    free(data); // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
+    free(data); 
+    // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
 }
 
 void UARTController::_parseData(uint8_t* data) {
     int buffIdx = 0;
-    uint8_t startDelimiter = data[0];   // Use uint8_t since it matches example which is working
+    uint8_t startDelimiter = data[0];                               // Use uint8_t since it matches example which is working
     
     while (data[buffIdx] != 0) {
-        if (startDelimiter == 0x7E) {       // The start delimiter of a Digimesh message is always 7E
+        if (startDelimiter == 0x7E) {                               // The start delimiter of a Digimesh message is always 7E
             Digimesh_msg currentMsg = Digimesh_msg(data);
             buffIdx = currentMsg.digimesh_parse(data, buffIdx);
             // Depending on message call different functions
-
-
+            uint8_t* msg_in = currentMsg.get_rfData();
+            int msg_len = currentMsg.get_dataSize();
+            
+            if (!_msgDecision(msg_in, hrtb_msg, msg_len)) {         //Function will return 0 if all char match so need "not"
+                ESP_LOGI(UART_TAG, "HRTB message received");
+                // Do some stuff based on Brett's stuff
+            }
+            else if (!_msgDecision(msg_in, strt_msg, msg_len)) {
+                ESP_LOGI(UART_TAG, "STRT message received");
+                if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                    if (state == State::CONFIGURED) {
+                        state = State::ARMED;
+                        ESP_LOGI(UART_TAG, "State changed to ARMED");
+                    }
+                    xSemaphoreGive(stateMutex);
+                }
+                else {
+                    ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                }
+            }
+            else if (!_msgDecision(msg_in, burn_msg, msg_len)) {
+                ESP_LOGI(UART_TAG, "BURN message received");
+                if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                    if (state == State::ARMED) {
+                        state = State::LIVE;
+                        ESP_LOGI(UART_TAG, "State changed to LIVE");
+                    }
+                    xSemaphoreGive(stateMutex);
+                }
+                else {
+                    ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                }
+            }
+            else if (!_msgDecision(msg_in, stop_msg, msg_len)) {
+                ESP_LOGI(UART_TAG, "STOP message received");
+                if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                    if (state == State::LIVE) {
+                        state = State::SLEEP;
+                        ESP_LOGI(START_TAG, "State changed to SLEEP");
+                    }
+                    xSemaphoreGive(stateMutex);
+                }
+                else {
+                    ESP_LOGE(START_TAG, "Could not obtain mutex before timeout");
+                }
+            }
+            else {
+                ESP_LOGI(UART_TAG, "Unrecognized message recieved");
+            }
+        // Delete msg object to save memory?
         // want to clear the bytes from the buffer once they have been read
         }
 
@@ -134,5 +185,15 @@ void UARTController::_parseData(uint8_t* data) {
             buffIdx++; //Increase buffer index to try to find next message
         }
     }
-    ESP_LOGI(UART_TAG, "OUTSIDE OF FOR LOOP");
+}
+
+int UARTController::_msgDecision(uint8_t* msgData, uint8_t* expectedMsg, int msgLen) {
+    int mismatch = 0;
+
+    for (int i = 0; i<msgLen; i++) {
+        if (msgData[i] != expectedMsg[i]) {
+            mismatch++;
+        }
+    }
+    return mismatch;
 }
