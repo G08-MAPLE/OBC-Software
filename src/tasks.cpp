@@ -1,3 +1,4 @@
+#include "config.h"
 #include "tasks.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
