@@ -23,9 +23,11 @@ void startup(void * param){
         if (state == State::BOOT) {
             // Initialize SPIFFS filesystem (fs)
             // dartFs.config();
+
             // Initialize Radio comms. (UART)
             xBeeRadio.config();
             ESP_LOGI(START_TAG, "UART Controller created");
+            
             // TODO: Initialize sensors and I2C bus 
 
 
@@ -42,13 +44,18 @@ void startup(void * param){
 
         else {
             ESP_LOGI(START_TAG, "State is not in BOOT");
+            // uint8_t data[] = {0x7E, 0x28, 0x29, 0x30};
+            // char* test_str = "This is a test string.\n";
+
             // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to 
             // scheduler will need to call vTaskResume(startup) in order for this task to be accessible again.
+            
             // xBeeRadio.XBEE_digi_tx();
-            // xBeeRadio.XBEE_tx(data);
+            // xBeeRadio.XBEE_tx(test_str);
             // vTaskDelay(pdMS_TO_TICKS(1000));
             xBeeRadio.XBEE_rx();
             vTaskDelay(pdMS_TO_TICKS(1000));
+
             // vTaskSuspend(NULL);     // passing NULL will suspend calling task
         }
     }
