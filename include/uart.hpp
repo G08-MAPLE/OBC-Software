@@ -10,14 +10,15 @@ private:
     // static const int RX_BUF_SIZE = 1024;
     int _sendData(const char* logName, const char* data);
     void _parseData(uint8_t* data);
+    int _msgDecision(uint8_t* msgData, uint8_t* expectedMsg, int msgLen);
 
 public:
     UARTController();
     void config();
     void XBEE_tx(const char* dataTx);
+    void XBEE_digi_tx();
     void XBEE_rx();
+    
 };
-
-
 
 #endif

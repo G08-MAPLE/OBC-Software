@@ -23,6 +23,7 @@ State state = State::BOOT;
 void setup() {
   
   esp_log_level_set("*", ESP_LOG_INFO);
+  ESP_LOGI(TAG, "Starting program");
   ESP_LOGI(TAG, "starting UART config");
 
   ESP_LOGI(TAG, "UART configured successfully");
