@@ -7,11 +7,11 @@
 // Maybe create a namespace to contextualize variables Global?
 enum class State {
         BOOT,
-        CONFIGURED, 
-        ONLINE, 
+        CONFIGURED,
+        ONLINE,
         ARMED, 
-        LIVE, 
-        COMPLETE, 
+        LIVE,
+        COMPLETE,
         SLEEP,
         };
 

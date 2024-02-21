@@ -1,5 +1,6 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE //Defined before esp_log.h as per espressif docs
 
+#include "digimesh_msg.hpp"
 #include "driver/gpio.h"
 #include "driver/uart.h"
 #include "esp_log.h"
@@ -25,9 +26,13 @@
 
 #define UART_BAUD_RATE     115200
 #define UART_STACK_SIZE    2048
-// #define RX_BUF_SIZE        (1024)
+
 static const int RX_BUF_SIZE = 1024;
 
+uint8_t strt_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x72, 0x74};
+uint8_t burn_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x62, 0x75, 0x72, 0x6E};
+uint8_t stop_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x6F, 0x70};
+uint8_t hrtb_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x68, 0x72, 0x62, 0x74};
 
 UARTController::UARTController(){
     // const int RX_BUF_SIZE = 1024;
@@ -80,6 +85,15 @@ void UARTController::XBEE_tx(const char* dataTx) {
         // TODO look into messaging rates to maximized data collection
 }
 
+void UARTController::XBEE_digi_tx() {
+    uint16_t hex_data[] = {0x7E, 0x00, 0x13, 0x10, 0x01, 0x00, 0x13, 0xA2, 0x00, 0x42, 0x3F, 0x4B, 0x9F, 0xFF, 0xFE, 0x00, 0x00,
+                           0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xDD};
+
+    int data_len = sizeof(hex_data);
+    const int txBytes = uart_write_bytes(UART_NUM_2, hex_data, data_len);
+    ESP_LOGI(UART_TAG, "Wrote %d bytes", txBytes);
+}
+
 void UARTController::XBEE_rx() {
     uint8_t* data = (uint8_t*) malloc(RX_BUF_SIZE+1);
     const int rxBytes = uart_read_bytes(UART_NUM_2, data, RX_BUF_SIZE, 1000 / portTICK_PERIOD_MS);
@@ -87,12 +101,106 @@ void UARTController::XBEE_rx() {
             data[rxBytes] = 0;
             ESP_LOGI(UART_TAG, "Read %d bytes: '%s'", rxBytes, data);
             ESP_LOG_BUFFER_HEXDUMP(UART_TAG, data, rxBytes, ESP_LOG_INFO);
-            // Parse data
-            // Depending on message call different functions
+            // Parse incoming data
+            _parseData(data);
         }
-    free(data); // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
+        else {
+            ESP_LOGI(UART_TAG, "UART Rx buffer is empty.");
+        }
+    free(data); 
+    // This was in original file that came from example code, think it has something to do with clearing buffer should look into in the future
 }
 
 void UARTController::_parseData(uint8_t* data) {
+    int buffIdx = 0;
+    uint8_t startDelimiter = data[0];                               // Use uint8_t since it matches example which is working
     
+    while (data[buffIdx] != 0) {
+        if (startDelimiter == 0x7E) {                               // The start delimiter of a Digimesh message is always 7E
+            Digimesh_msg currentMsg = Digimesh_msg(data);
+            buffIdx = currentMsg.digimesh_parse(data, buffIdx);
+            // Depending on message call different functions
+            if (currentMsg.get_msgType() == 0x90) {                   // Transmit request frame
+                uint8_t* msg_in = currentMsg.get_rfData();
+                int msg_len = currentMsg.get_dataSize();
+                if (!_msgDecision(msg_in, hrtb_msg, msg_len)) {         //Function will return 0 if all char match so need "not"
+                ESP_LOGI(UART_TAG, "HRTB message received");
+                // Do some stuff based on Brett's stuff
+                }
+                else if (!_msgDecision(msg_in, strt_msg, msg_len)) {
+                    ESP_LOGI(UART_TAG, "STRT message received");
+                    if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                        if (state == State::CONFIGURED) {
+                            state = State::ARMED;
+                            ESP_LOGI(UART_TAG, "State changed to ARMED");
+                        }
+                        xSemaphoreGive(stateMutex);
+                    }
+                    else {
+                        ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                    }
+                }
+                else if (!_msgDecision(msg_in, burn_msg, msg_len)) {
+                    ESP_LOGI(UART_TAG, "BURN message received");
+                    if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                        if (state == State::ARMED) {
+                            state = State::LIVE;
+                            ESP_LOGI(UART_TAG, "State changed to LIVE");
+                        }
+                        xSemaphoreGive(stateMutex);
+                    }
+                    else {
+                        ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                    }
+                }
+                else if (!_msgDecision(msg_in, stop_msg, msg_len)) {
+                    ESP_LOGI(UART_TAG, "STOP message received");
+                    if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                        if (state == State::LIVE) {
+                            state = State::SLEEP;
+                            ESP_LOGI(START_TAG, "State changed to SLEEP");
+                        }
+                        xSemaphoreGive(stateMutex);
+                    }
+                    else {
+                        ESP_LOGE(START_TAG, "Could not obtain mutex before timeout");
+                    }
+                }
+                else {
+                    ESP_LOGI(UART_TAG, "Unrecognized message recieved");
+                }
+            }
+
+            else if (currentMsg.get_msgType() == 0x89) {
+                int frameStatus = currentMsg.get_deliveryStatus();
+                ESP_LOGI(UART_TAG, "Transmission Status message was read from UART");
+            }
+
+            else {
+                ESP_LOGI(UART_TAG, "Unrecognized Message of Type: %02X", currentMsg.get_msgType());
+            }
+        // Delete msg object to save memory?
+        // want to clear the bytes from the buffer once they have been read
+        }
+
+        else if (startDelimiter == 0) { 
+            // End of buffer, end function???
+        }
+
+        else {
+            ESP_LOGI(UART_TAG, "Current Data %02X", data[buffIdx]);
+            buffIdx++; //Increase buffer index to try to find next message
+        }
+    }
+}
+
+int UARTController::_msgDecision(uint8_t* msgData, uint8_t* expectedMsg, int msgLen) {
+    int mismatch = 0;
+
+    for (int i = 0; i<msgLen; i++) {
+        if (msgData[i] != expectedMsg[i]) {
+            mismatch++;
+        }
+    }
+    return mismatch;
 }
