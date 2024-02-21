@@ -26,8 +26,6 @@ void setup() {
   ESP_LOGI(TAG, "Starting program");
   ESP_LOGI(TAG, "starting UART config");
 
-  UART_config();
-
   ESP_LOGI(TAG, "UART configured successfully");
 
   //Begin I2C for accelerometer
