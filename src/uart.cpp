@@ -79,15 +79,14 @@ int UARTController::_sendData(const char* logName, const char* data) {
     return txBytes;
 }
 
-void UARTController::XBEE_tx(const char* dataTx) {
-        _sendData(UART_TAG, dataTx);
+void UARTController::XBEE_tx(char* dataTx) {
+        _sendData(UART_TAG, (const char*) dataTx);
         // vTaskDelay(4000 / portTICK_PERIOD_MS);                      //This is default message rate
         // TODO look into messaging rates to maximized data collection
 }
 
 void UARTController::XBEE_digi_tx() {
-    uint16_t hex_data[] = {0x7E, 0x00, 0x13, 0x10, 0x01, 0x00, 0x13, 0xA2, 0x00, 0x42, 0x3F, 0x4B, 0x9F, 0xFF, 0xFE, 0x00, 0x00,
-                           0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xDD};
+    uint16_t hex_data[] = {0x62, 0x75, 0x72, 0x6E};
 
     int data_len = sizeof(hex_data);
     const int txBytes = uart_write_bytes(UART_NUM_2, hex_data, data_len);

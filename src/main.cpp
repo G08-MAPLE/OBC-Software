@@ -24,15 +24,6 @@ void setup() {
   
   esp_log_level_set("*", ESP_LOG_INFO);
   ESP_LOGI(TAG, "Starting program");
-  ESP_LOGI(TAG, "starting UART config");
-
-  UART_config();
-
-  ESP_LOGI(TAG, "UART configured successfully");
-
-  //Begin I2C for accelerometer
-  if(Wire.begin()) ESP_LOGI(TAG, "I2C Started Successfully");
-  else ESP_LOGI(TAG, "I2C Failed");
 
   startTasks();
 }
