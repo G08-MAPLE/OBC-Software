@@ -32,7 +32,7 @@ static const int RX_BUF_SIZE = 1024;
 uint8_t strt_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x72, 0x74};
 uint8_t burn_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x62, 0x75, 0x72, 0x6E};
 uint8_t stop_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x6F, 0x70};
-uint8_t hrtb_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x68, 0x72, 0x74, 0x62};
+uint8_t hrtb_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x68, 0x72, 0x62, 0x74};
 
 UARTController::UARTController(){
     // const int RX_BUF_SIZE = 1024;
@@ -123,54 +123,63 @@ void UARTController::_parseData(uint8_t* data) {
             Digimesh_msg currentMsg = Digimesh_msg(data);
             buffIdx = currentMsg.digimesh_parse(data, buffIdx);
             // Depending on message call different functions
-            uint8_t* msg_in = currentMsg.get_rfData();
-            int msg_len = currentMsg.get_dataSize();
-            
-            if (!_msgDecision(msg_in, hrtb_msg, msg_len)) {         //Function will return 0 if all char match so need "not"
+            if (currentMsg.get_msgType() == 0x90) {                   // Transmit request frame
+                uint8_t* msg_in = currentMsg.get_rfData();
+                int msg_len = currentMsg.get_dataSize();
+                if (!_msgDecision(msg_in, hrtb_msg, msg_len)) {         //Function will return 0 if all char match so need "not"
                 ESP_LOGI(UART_TAG, "HRTB message received");
                 // Do some stuff based on Brett's stuff
-            }
-            else if (!_msgDecision(msg_in, strt_msg, msg_len)) {
-                ESP_LOGI(UART_TAG, "STRT message received");
-                if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                    if (state == State::CONFIGURED) {
-                        state = State::ARMED;
-                        ESP_LOGI(UART_TAG, "State changed to ARMED");
+                }
+                else if (!_msgDecision(msg_in, strt_msg, msg_len)) {
+                    ESP_LOGI(UART_TAG, "STRT message received");
+                    if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                        if (state == State::CONFIGURED) {
+                            state = State::ARMED;
+                            ESP_LOGI(UART_TAG, "State changed to ARMED");
+                        }
+                        xSemaphoreGive(stateMutex);
                     }
-                    xSemaphoreGive(stateMutex);
+                    else {
+                        ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                    }
+                }
+                else if (!_msgDecision(msg_in, burn_msg, msg_len)) {
+                    ESP_LOGI(UART_TAG, "BURN message received");
+                    if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                        if (state == State::ARMED) {
+                            state = State::LIVE;
+                            ESP_LOGI(UART_TAG, "State changed to LIVE");
+                        }
+                        xSemaphoreGive(stateMutex);
+                    }
+                    else {
+                        ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                    }
+                }
+                else if (!_msgDecision(msg_in, stop_msg, msg_len)) {
+                    ESP_LOGI(UART_TAG, "STOP message received");
+                    if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+                        if (state == State::LIVE) {
+                            state = State::SLEEP;
+                            ESP_LOGI(START_TAG, "State changed to SLEEP");
+                        }
+                        xSemaphoreGive(stateMutex);
+                    }
+                    else {
+                        ESP_LOGE(START_TAG, "Could not obtain mutex before timeout");
+                    }
                 }
                 else {
-                    ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
+                    ESP_LOGI(UART_TAG, "Unrecognized message recieved");
                 }
             }
-            else if (!_msgDecision(msg_in, burn_msg, msg_len)) {
-                ESP_LOGI(UART_TAG, "BURN message received");
-                if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                    if (state == State::ARMED) {
-                        state = State::LIVE;
-                        ESP_LOGI(UART_TAG, "State changed to LIVE");
-                    }
-                    xSemaphoreGive(stateMutex);
-                }
-                else {
-                    ESP_LOGE(UART_TAG, "Could not obtain mutex before timeout");
-                }
+
+            else if (currentMsg.get_msgType() == 0x89) {
+                int frameStatus = currentMsg.get_deliveryStatus();
             }
-            else if (!_msgDecision(msg_in, stop_msg, msg_len)) {
-                ESP_LOGI(UART_TAG, "STOP message received");
-                if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                    if (state == State::LIVE) {
-                        state = State::SLEEP;
-                        ESP_LOGI(START_TAG, "State changed to SLEEP");
-                    }
-                    xSemaphoreGive(stateMutex);
-                }
-                else {
-                    ESP_LOGE(START_TAG, "Could not obtain mutex before timeout");
-                }
-            }
+
             else {
-                ESP_LOGI(UART_TAG, "Unrecognized message recieved");
+                ESP_LOGI(UART_TAG, "Unrecognized Message of Type: %02X", currentMsg.get_msgType());
             }
         // Delete msg object to save memory?
         // want to clear the bytes from the buffer once they have been read

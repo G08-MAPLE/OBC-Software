@@ -149,19 +149,25 @@ int Digimesh_msg::_verifyChecksum() {
     /* This function will verify data integrity of a frame by verifying its checksum. */
     int frameSum = 0;
     frameSum += _msgType;
-    
-    for (int i=0; i<_sizeSendAddr; i++) {
-        frameSum += _senderAddr[i];
+    if (_msgType == 0x90) {
+        for (int i=0; i<_sizeSendAddr; i++) {
+            frameSum += _senderAddr[i];
+        }
+        
+        for (int x=0; x< _sizeShortAddr; x++) {
+            frameSum += _shortAddr[x];
+        }
+        
+        frameSum += _rxOptions;
+        
+        for (int y=0; y<_dataSize; y++) {
+            frameSum += _rfData[y];
+        }
     }
-    
-    for (int x=0; x< _sizeShortAddr; x++) {
-        frameSum += _shortAddr[x];
-    }
-    
-    frameSum += _rxOptions;
-    
-    for (int y=0; y<_dataSize; y++) {
-        frameSum += _rfData[y];
+
+    else if (_msgType == 0x89) {
+        frameSum += _frameId;
+        frameSum += _deliveryStatus;
     }
 
     frameSum += _msgChecksum;
@@ -202,4 +208,12 @@ uint8_t* Digimesh_msg::get_rfData() {
 
 int Digimesh_msg::get_dataSize() {
     return _dataSize;
+}
+
+int Digimesh_msg::get_msgType() {
+    return _msgType;
+}
+
+int Digimesh_msg::get_deliveryStatus() {
+    return _deliveryStatus;
 }

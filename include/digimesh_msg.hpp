@@ -52,6 +52,8 @@ public:
     int digimesh_parse(uint8_t* dataFrame, int rxBuffIdx);
     uint8_t* get_rfData();
     int get_dataSize();
+    int get_msgType();
+    int get_deliveryStatus();
 };
 
 #endif
