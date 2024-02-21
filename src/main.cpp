@@ -1,14 +1,11 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
-<<<<<<< HEAD
 #include <Arduino.h>
 #include <stdio.h>
 #include <Wire.h>
-=======
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_spiffs.h"
->>>>>>> b106e725163965dc90d7f7472a50c7765b125f36
 #include "main.hpp"
 #include "UART_config.hpp"
 

@@ -7,6 +7,7 @@
 // SCL = GPIO 22
 
 void acc_read(void * param){
+    
     for(;;){
         
     }
