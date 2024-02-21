@@ -2,7 +2,7 @@
 #define PINDEFS_H
 
 //State Control
-#define PIN_BURN_WIRE 32
+#define PIN_BURN_WIRE GPIO_NUM_32
 #define PIN_MCU_KILL 33
 
 //Accelerometer I2C Bus
@@ -16,8 +16,8 @@
 #define PIN_JTAG_TDO 15
 
 //XBEE UART Bus
-#define PIN_XBEE_RX 4
-#define PIN_XBEE_TX 16
+#define PIN_XBEE_RX 16
+#define PIN_XBEE_TX 17
 
 //Debugging LEDs
 #define PIN_LEDB 18

@@ -1,20 +1,32 @@
-#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE //Defined before esp_log.h as per espressif docs
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
+<<<<<<< HEAD
 #include <Arduino.h>
 #include <stdio.h>
 #include <Wire.h>
+=======
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_spiffs.h"
+>>>>>>> b106e725163965dc90d7f7472a50c7765b125f36
 #include "main.hpp"
 #include "UART_config.hpp"
-#include "esp_log.h"
 
 static const char *TAG = "MAIN";
 
+//Create Mutexes to ensure resources are used safely
+SemaphoreHandle_t stateMutex = xSemaphoreCreateMutex();       //State Mutex
+SemaphoreHandle_t flashMemMutex = xSemaphoreCreateMutex();    //Memory Mutex
+SemaphoreHandle_t memBufferMutex = xSemaphoreCreateMutex();   //Memory Buffer Mutex
+
+//Initialize state
+State state = State::BOOT;
+
 //runs once on power up
 void setup() {
+  
   esp_log_level_set("*", ESP_LOG_INFO);
   ESP_LOGI(TAG, "starting UART config");
-
-  UART_config();
 
   ESP_LOGI(TAG, "UART configured successfully");
 
@@ -30,5 +42,3 @@ void setup() {
   void loop() {
     
   }
-
-
