@@ -31,8 +31,8 @@ void startup(void * param){
 
             ESP_LOGI(START_TAG, "Changing States");
             if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                state = State::CONFIGURED;
-                ESP_LOGI(START_TAG, "State changed to CONFIGURED");
+                state = State::ONLINE;
+                ESP_LOGI(START_TAG, "State changed to ONLINE");
                 xSemaphoreGive(stateMutex);
             }
             else {
@@ -44,11 +44,11 @@ void startup(void * param){
             ESP_LOGI(START_TAG, "State is not in BOOT");
             // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to 
             // scheduler will need to call vTaskResume(startup) in order for this task to be accessible again.
-            xBeeRadio.XBEE_digi_tx();
+            // xBeeRadio.XBEE_digi_tx();
             // xBeeRadio.XBEE_tx(data);
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            // vTaskDelay(pdMS_TO_TICKS(1000));
             xBeeRadio.XBEE_rx();
-            vTaskDelay(pdMS_TO_TICKS(10000));
+            vTaskDelay(pdMS_TO_TICKS(1000));
             // vTaskSuspend(NULL);     // passing NULL will suspend calling task
         }
     }
