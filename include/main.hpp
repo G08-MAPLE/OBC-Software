@@ -7,7 +7,7 @@
 // Maybe create a namespace to contextualize variables Global?
 enum class State {
         BOOT,
-        CONFIGURED,
+        // CONFIGURED,             // Currently redunant since code-based subsystem tests have been cut for time.
         ONLINE,
         ARMED, 
         LIVE,

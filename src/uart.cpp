@@ -126,15 +126,17 @@ void UARTController::_parseData(uint8_t* data) {
                 int msg_len = currentMsg.get_dataSize();
 
                 if (!_msgDecision(msg_in, hrtb_msg, msg_len)) {         //Function will return 0 if all char match so need "not"
-                    ESP_LOGI(UART_TAG, "HRTB message received");
-                    // Do some stuff based on Brett's stuff
+
+                ESP_LOGI(UART_TAG, "HRTB message received");
+                // Do some stuff based on Brett's stuff
+                // Reset watchdog timer
                 }
                 else if (!_msgDecision(msg_in, strt_msg, msg_len)) {
                     ESP_LOGI(UART_TAG, "STRT message received");
+                    // Reset watchdog timer?
 
                     if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-
-                        if (state == State::CONFIGURED) {
+                        if (state == State::ONLINE) {
                             state = State::ARMED;
                             ESP_LOGI(UART_TAG, "State changed to ARMED");
                         }
@@ -147,6 +149,8 @@ void UARTController::_parseData(uint8_t* data) {
 
                 else if (!_msgDecision(msg_in, burn_msg, msg_len)) {
                     ESP_LOGI(UART_TAG, "BURN message received");
+                  
+                    // Reset watchdog timer?
 
                     if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
                         if (state == State::ARMED) {
@@ -162,6 +166,8 @@ void UARTController::_parseData(uint8_t* data) {
 
                 else if (!_msgDecision(msg_in, stop_msg, msg_len)) {
                     ESP_LOGI(UART_TAG, "STOP message received");
+
+                    // Reset watchdog timer?
 
                     if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
                         if (state == State::LIVE) {
@@ -181,8 +187,11 @@ void UARTController::_parseData(uint8_t* data) {
             }
 
             else if (currentMsg.get_msgType() == 0x89) {
+                // Reset watchdog timer?
                 int frameStatus = currentMsg.get_deliveryStatus();
-                ESP_LOGI(UART_TAG, "Transmission Status code: %02X", frameStatus);
+
+                ESP_LOGI(UART_TAG, "Transmission Status %02X", frameStatus);
+
             }
 
             else {

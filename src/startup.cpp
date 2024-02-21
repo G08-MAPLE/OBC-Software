@@ -33,8 +33,8 @@ void startup(void * param){
 
             ESP_LOGI(START_TAG, "Changing States");
             if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
-                state = State::CONFIGURED;
-                ESP_LOGI(START_TAG, "State changed to CONFIGURED");
+                state = State::ONLINE;
+                ESP_LOGI(START_TAG, "State changed to ONLINE");
                 xSemaphoreGive(stateMutex);
             }
             else {
