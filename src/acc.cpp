@@ -9,14 +9,20 @@
 // SDA = GPIO 21
 // SCL = GPIO 22
 
-char * TAG = "ACC";
+String ACC_TAG = "ACC";
 
 void acc_read(void * param){
-    ADC121C mADC121C = ADC121C(0x55);
+    ADC121C mADC121C = ADC121C(0x50);               // Address of ADC chip is 0x50, found experimentally
+    mADC121C.begin();
     unsigned int conversion;
 
     for(;;){
         conversion = mADC121C.readConversion();
-        ESP_LOGI(TAG, "ADC: %d\n", conversion);
+        ESP_LOGI(ACC_TAG, "ADC: %d\n", conversion);
+        
+        // Add support to write to SD card
+        // Made sure that write process is thread safe
+
+        vTaskDelay(pdMS_TO_TICKS(10));              // Run at ~100 Hz
     }
 }
