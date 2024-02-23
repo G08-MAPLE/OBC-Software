@@ -1,6 +1,8 @@
 #ifndef UART_config_H
 #define UART_config_H
 
+#include <stdint.h>
+
 class UARTController {
 // This class will contain all the functions necessary to configure the ESP32 UART and all functions related to 
 // sending messages through the XBEE modules.

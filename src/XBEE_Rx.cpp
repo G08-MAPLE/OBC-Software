@@ -1,4 +1,6 @@
 #include "XBEE_Rx.hpp"
+#include "main.hpp"
+#include "startup.hpp"
 
 static UARTController xBeeRadio;
  
