@@ -29,6 +29,7 @@ int sendData(const char* logName, const char* data)
 void XBEE_tx(void * param){
     static const char *TX_TAG = "TX_TASK";
     UARTController* xBeeRadio = getXBeeRadio();             // Shares name across files to represent shared resource
+    const int TX_DELAY = 2000;
 
     for(;;){
         if (state == State::COMPLETE) {
@@ -37,8 +38,8 @@ void XBEE_tx(void * param){
             // TODO: Keep track of data in memory so that we know when all collected data has been transferred
 
             // sendData(TX_TAG, "DART to GND_CONTROL\n");
-            xBeeRadio -> XBEE_digi_tx();
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            xBeeRadio -> XBEE_digi_static_tx();
+            vTaskDelay(pdMS_TO_TICKS(TX_DELAY));
             // vTaskDelay(4000 / portTICK_PERIOD_MS);          // This was the message sending speed of the example I copied
 
             // TODO: IF all data has been transferred
