@@ -1,4 +1,10 @@
 #include "acc.hpp"
+#include <Arduino.h>
+#include "ADC121C.hpp"
+#include "esp_log.h"
+#include "main.hpp"
+#include <stdio.h>
+#include <Wire.h>
 
 // using default i2c bus
 // SDA = GPIO 21
