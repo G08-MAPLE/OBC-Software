@@ -19,6 +19,7 @@
 */
 
 int sendData(const char* logName, const char* data)
+// This is no longer useful
 {
     const int len = strlen(data);
     const int txBytes = uart_write_bytes(UART_NUM_2, data, len);
@@ -29,7 +30,7 @@ int sendData(const char* logName, const char* data)
 void XBEE_tx(void * param){
     static const char *TX_TAG = "TX_TASK";
     UARTController* xBeeRadio = getXBeeRadio();             // Shares name across files to represent shared resource
-    const int TX_DELAY = 2000;
+    const int TX_DELAY = 1000;
 
     for(;;){
         if (state == State::COMPLETE) {
