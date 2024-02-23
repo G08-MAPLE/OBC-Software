@@ -171,8 +171,8 @@ void UARTController::_parseData(uint8_t* data) {
 
                     if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
                         if (state == State::LIVE) {
-                            state = State::SLEEP;
-                            ESP_LOGI(START_TAG, "State changed to SLEEP");
+                            state = State::COMPLETE;
+                            ESP_LOGI(START_TAG, "State changed to COMPLETE");
                         }
                         xSemaphoreGive(stateMutex);
                     }

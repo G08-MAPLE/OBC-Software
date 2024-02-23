@@ -26,9 +26,31 @@ int sendData(const char* logName, const char* data)
 
 void XBEE_tx(void * param){
     static const char *TX_TAG = "TX_TASK";
-    esp_log_level_set(TX_TAG, ESP_LOG_INFO);
+    UARTController* xBeeRadio = getXBeeRadio();             // Shares name across files to represent shared resource
+
     for(;;){
-        sendData(TX_TAG, "DART to GND_CONTROL\n");
-        vTaskDelay(4000 / portTICK_PERIOD_MS);
+        if (state == State::COMPLETE) {
+            // TODO: Pull acc. data from SD card
+            // TODO: Put acc. data into a Digimesh frame
+            // TODO: Keep track of data in memory so that we know when all collected data has been transferred
+
+            sendData(TX_TAG, "DART to GND_CONTROL\n");
+            vTaskDelay(4000 / portTICK_PERIOD_MS);          // This was the message sending speed of the example I copied
+
+            // TODO: IF all data has been transferred
+            // if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
+            //             if (state == State::COMPLETE) {
+            //                 state = State::SLEEP;
+            //                 ESP_LOGI(TX_TAG, "State changed to SLEEP");
+            //             }
+            //             xSemaphoreGive(stateMutex);
+            //         }
+            //         else {
+            //             ESP_LOGE(TX_TAG, "Could not obtain mutex before timeout");
+            //         }
+        }
+        else {
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
     }
 }

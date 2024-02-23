@@ -7,7 +7,6 @@
 #include "esp_err.h"
 #include "esp_spiffs.h"
 #include "main.hpp"
-#include "UART_config.hpp"
 
 static const char *TAG = "MAIN";
 
