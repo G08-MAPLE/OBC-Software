@@ -2,7 +2,6 @@
 #define XBEE_Rx_H
 
 #include "main.hpp"
-#include "spiffs.hpp"
 #include "startup.hpp"
 #include "uart.hpp"
 

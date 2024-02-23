@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "main.hpp"
 #include "tasks.hpp"
-#include "spiffs.hpp"
+// #include "spiffs.hpp"
 #include "uart.hpp"
 #include "XBEE_Rx.hpp"
 
