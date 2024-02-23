@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <Wire.h>
 #include "main.hpp"
-#include "UART_config.hpp"
 
 static const char *TAG = "MAIN";
 
