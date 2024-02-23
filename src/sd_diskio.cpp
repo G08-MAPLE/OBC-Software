@@ -17,7 +17,7 @@
 
 #include "sd_diskio.h"
 #include "esp_system.h"
-#include "../lib/esp32-hal-periman.h"
+#include "./esp32-hal-periman.h"
 
 extern "C" {
     #include "ff.h"
@@ -816,9 +816,9 @@ bool sdcard_mount(uint8_t pdrv, const char* path, uint8_t max_files, bool format
               log_e("alloc for f_mkfs failed");
               return false;
             }
-            //FRESULT f_mkfs (const TCHAR* path, const MKFS_PARM* opt, void* work, UINT len);
-            const MKFS_PARM opt = {(BYTE)FM_ANY, 0, 0, 0, 0};
-            res = f_mkfs(drv, &opt, (DWORD) work, sizeof(BYTE) * FF_MAX_SS);
+            //FRESULT f_mkfs (const TCHAR* path, const MKFS_PARM* opt, DWORD au, void* work, UINT len);
+            const BYTE opt = FM_FAT32;
+            res = f_mkfs(drv, opt, 0, work, sizeof(BYTE) * FF_MAX_SS); //https://hhoegl.informatik.hs-augsburg.de/fablab/STEVAL-3DP001V1/Marlin4ST/stm32_cube/STM32/FatFs/doc/en/mkfs.html
             free(work);
             if (res != FR_OK) {
                 log_e("f_mkfs failed: %s", fferr2str[res]);
