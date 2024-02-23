@@ -1,9 +1,4 @@
-#include <Arduino.h>
 #include "acc.hpp"
-#include <Wire.h>
-#include "ADC121C.hpp"
-#include "esp_log.h"
-#include <stdio.h>
 
 // using default i2c bus
 // SDA = GPIO 21
@@ -18,14 +13,19 @@ void acc_read(void * param){
     unsigned int measuredForce;
 
     for(;;){
-        conversion = mADC121C.readConversion();
-        measuredForce = gForceConversion(conversion);
-        ESP_LOGI(ACC_TAG, "Measured Force: %d G's\n", measuredForce);
-        
-        // Add support to write to SD card
-        // Made sure that write process is thread safe
+        if (state == State::LIVE) {
+            conversion = mADC121C.readConversion();
+            measuredForce = gForceConversion(conversion);
+            ESP_LOGI(ACC_TAG, "Measured Force: %d G's", measuredForce);
+            
+            // Add support to write to SD card
+            // Made sure that write process is thread safe
 
-        vTaskDelay(pdMS_TO_TICKS(10));              // Run at ~100 Hz
+            vTaskDelay(pdMS_TO_TICKS(10));              // Run at ~100 Hz
+        }
+        else {
+            vTaskDelay(pdMS_TO_TICKS(100));             // If state not LIVE wait before checking again
+        }
     }
 }
 
