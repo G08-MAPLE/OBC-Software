@@ -27,6 +27,7 @@
 #define UART_BAUD_RATE     115200
 #define UART_STACK_SIZE    2048
 
+static const char *UART_TAG = "UART_Controller";
 static const int RX_BUF_SIZE = 1024;
 
 uint8_t strt_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x72, 0x74};

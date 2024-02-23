@@ -7,6 +7,8 @@
 #include "driver/uart.h"
 #include "string.h"
 #include "driver/gpio.h"
+#include "tasks.hpp"
+#include "startup.hpp"
 
 /**
  * This thread will assume that the UART driver has already been configured.
