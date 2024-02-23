@@ -36,8 +36,10 @@ void XBEE_tx(void * param){
             // TODO: Put acc. data into a Digimesh frame
             // TODO: Keep track of data in memory so that we know when all collected data has been transferred
 
-            sendData(TX_TAG, "DART to GND_CONTROL\n");
-            vTaskDelay(4000 / portTICK_PERIOD_MS);          // This was the message sending speed of the example I copied
+            // sendData(TX_TAG, "DART to GND_CONTROL\n");
+            xBeeRadio -> XBEE_digi_tx();
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            // vTaskDelay(4000 / portTICK_PERIOD_MS);          // This was the message sending speed of the example I copied
 
             // TODO: IF all data has been transferred
             // if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
