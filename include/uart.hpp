@@ -15,7 +15,7 @@ private:
 public:
     UARTController();
     void config();
-    void XBEE_tx(char* dataTx);
+    void XBEE_tx(uint8_t* dataTx, int len);
     void XBEE_digi_static_tx();
     void XBEE_rx();
     

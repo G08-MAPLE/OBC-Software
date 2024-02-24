@@ -32,6 +32,7 @@ private:
     const int _sizeShortAddr = 2;                                   // Size in bytes of short address arry
     int _dataSize;                                                  // Size in bytes of data in frame
 
+
     // Methods
     void _extractStartDelimiter(uint8_t* data, int buffIdx);
     void _extractMsgLength(uint8_t* data);

@@ -80,9 +80,10 @@ int UARTController::_sendData(const char* logName, const char* data) {
     return txBytes;
 }
 
-void UARTController::XBEE_tx(char* dataTx) {
-        _sendData(UART_TAG, (const char*) dataTx);
-        vTaskDelay(4000 / portTICK_PERIOD_MS);                      //This is default message rate
+void UARTController::XBEE_tx(uint8_t* dataTx, int len) {
+        const int txBytes = uart_write_bytes(UART_NUM_2, dataTx, len);
+        ESP_LOGI(UART_TAG, "Wrote %d bytes", txBytes);
+        vTaskDelay(1000);
         // TODO look into messaging rates to maximized data collection
 }
 
