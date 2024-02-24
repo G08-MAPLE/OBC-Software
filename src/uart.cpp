@@ -197,6 +197,11 @@ void UARTController::_parseData(uint8_t* data) {
 
             }
 
+            else if (currentMsg.get_msgType() == 0x8B) {
+                // Reset watchdog timer?
+                ESP_LOGI(UART_TAG, "Transmit Status frame 8B Received");
+            }
+
             else {
                 ESP_LOGI(UART_TAG, "Unrecognized Message of Type: %02X", currentMsg.get_msgType());
             }
