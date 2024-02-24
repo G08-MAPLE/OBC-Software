@@ -1,7 +1,7 @@
 #ifndef UART_config_H
 #define UART_config_H
 
-static const char *UART_TAG = "UART_Controller";
+#include <stdint.h>
 
 class UARTController {
 // This class will contain all the functions necessary to configure the ESP32 UART and all functions related to 
@@ -15,8 +15,8 @@ private:
 public:
     UARTController();
     void config();
-    void XBEE_tx(char* dataTx);
-    void XBEE_digi_tx();
+    void XBEE_tx(uint8_t* dataTx, int len);
+    void XBEE_digi_static_tx();
     void XBEE_rx();
     
 };

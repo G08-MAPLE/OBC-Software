@@ -43,12 +43,8 @@ void startup(void * param){
 
         else {
             ESP_LOGI(START_TAG, "State is not in BOOT");
-            // uint8_t data[] = {0x7E, 0x28, 0x29, 0x30};
-            // char* test_str = "This is a test string.\n";
-
             // If not in boot controller must be already configured. Suspend config task. Task will no longer be available to 
             // scheduler will need to call vTaskResume(startup) in order for this task to be accessible again.
-
             vTaskSuspend(NULL);     // passing NULL will suspend calling task
         }
     }

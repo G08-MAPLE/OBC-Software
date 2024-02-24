@@ -1,13 +1,12 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
-#include "esp_log.h"
-#include "esp_err.h"
-#include "esp_spiffs.h"
 #include <Arduino.h>
 #include <stdio.h>
 #include <Wire.h>
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_spiffs.h"
 #include "main.hpp"
-#include "UART_config.hpp"
 #include "sd_log.hpp"
 
 static const char *TAG = "MAIN";

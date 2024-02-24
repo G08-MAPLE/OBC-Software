@@ -27,6 +27,7 @@
 #define UART_BAUD_RATE     115200
 #define UART_STACK_SIZE    2048
 
+static const char *UART_TAG = "UART_Controller";
 static const int RX_BUF_SIZE = 1024;
 
 uint8_t strt_msg[8] = {0x63, 0x6F, 0x6D, 0x5F, 0x73, 0x74, 0x72, 0x74};
@@ -79,14 +80,16 @@ int UARTController::_sendData(const char* logName, const char* data) {
     return txBytes;
 }
 
-void UARTController::XBEE_tx(char* dataTx) {
-        _sendData(UART_TAG, (const char*) dataTx);
-        vTaskDelay(4000 / portTICK_PERIOD_MS);                      //This is default message rate
+void UARTController::XBEE_tx(uint8_t* dataTx, int len) {
+        const int txBytes = uart_write_bytes(UART_NUM_2, dataTx, len);
+        ESP_LOGI(UART_TAG, "Wrote %d bytes", txBytes);
+        vTaskDelay(1000);
         // TODO look into messaging rates to maximized data collection
 }
 
-void UARTController::XBEE_digi_tx() {
-    uint16_t hex_data[] = {0x62, 0x75, 0x72, 0x6E};
+void UARTController::XBEE_digi_static_tx() {
+    uint8_t hex_data[] = {0x7E, 0x00, 0x18, 0x10, 0x01, 0x00, 0x13, 0xA2, 0x00, 0x41, 0x5B, 0xAD, 0x65, 0xFF, 0xFE, 0x00, 0x00,
+                          0x49, 0x20, 0x61, 0x6D, 0x20, 0x61, 0x6C, 0x69, 0x76, 0x65, 0x26};
 
     int data_len = sizeof(hex_data);
     const int txBytes = uart_write_bytes(UART_NUM_2, hex_data, data_len);
@@ -171,8 +174,8 @@ void UARTController::_parseData(uint8_t* data) {
 
                     if (xSemaphoreTake(stateMutex, ( TickType_t ) 100) == pdTRUE) {
                         if (state == State::LIVE) {
-                            state = State::SLEEP;
-                            ESP_LOGI(START_TAG, "State changed to SLEEP");
+                            state = State::COMPLETE;
+                            ESP_LOGI(START_TAG, "State changed to COMPLETE");
                         }
                         xSemaphoreGive(stateMutex);
                     }
@@ -192,6 +195,11 @@ void UARTController::_parseData(uint8_t* data) {
 
                 ESP_LOGI(UART_TAG, "Transmission Status %02X", frameStatus);
 
+            }
+
+            else if (currentMsg.get_msgType() == 0x8B) {
+                // Reset watchdog timer?
+                ESP_LOGI(UART_TAG, "Transmit Status frame 8B Received");
             }
 
             else {

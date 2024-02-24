@@ -6,7 +6,7 @@
 #include "tasks.hpp"
 #include "sd_log.hpp"
 #include "uart.hpp"
-#include "XBEE.hpp"
+#include "XBEE_Rx.hpp"
 
 static const char *START_TAG = "Start";
 
