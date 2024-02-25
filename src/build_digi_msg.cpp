@@ -126,3 +126,25 @@ void Build_digi_msg::print_txFrame(uint8_t* frameBytes, int frameSize) {
     // Use for debugging
     ESP_LOG_BUFFER_HEXDUMP(DIGI_BUILD_TAG, frameBytes, frameSize, ESP_LOG_INFO);
 }
+
+char* Build_digi_msg::convertToAscii(int accData) {
+    // Bing copilot gave example
+    int sizeDataIn = sizeof(accData);
+    _conversionArraySize = sizeDataIn;
+    char charArray[sizeDataIn];
+    ESP_LOGI(DIGI_BUILD_TAG, "DATA IN SIZE: %d", sizeDataIn);
+    int iterStart = sizeDataIn -1;
+    for(int i=iterStart; i >=0; --i) {
+        charArray[i] = static_cast<char>((accData % 10) + '0');
+        accData /= 10;
+    }
+    charArray[iterStart] = '\0'; // Null terminator
+}
+
+int Build_digi_msg::get_conversionArraySize() {
+    return _conversionArraySize;
+}
+
+uint8_t* createDataArray(uint8_t* data, int lenData) {
+
+}

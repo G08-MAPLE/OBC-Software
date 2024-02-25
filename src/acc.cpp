@@ -16,9 +16,9 @@ void acc_read(void * param){
     const int SAMPLING_RATE_DELAY = 10;               // Define the sampling rate based on delay vTaskDelayUntil() would provide more accurate sampling
     const int ACC_STATE_CHECK_DELAY = 100;            // Define how long to wait before re-checking system state
     unsigned int conversion;
-    unsigned int measuredForce;
+    uint16_t measuredForce;
 
-    ADC121C mADC121C = ADC121C(0x50);                 // Address of ADC chip is 0x50, found experimentally
+    ADC121C mADC121C = ADC121C(0x50);                 // Address of ADC chip is 0x50, found experimentally, all chips the same
     mADC121C.begin();
     
     for(;;){
