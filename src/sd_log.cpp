@@ -113,24 +113,19 @@ void readFile(fs::FS &fs, const char * path){
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){
-    ESP_LOGI(SD_TAG, "Writing file: %s\n", path);
 
     File file = fs.open(path, FILE_WRITE);
     if(!file){
         ESP_LOGI(SD_TAG, "Failed to open file for writing");
         return;
     }
-    if(file.print(message)){
-        ESP_LOGI(SD_TAG, "File written");
-    } else {
+    if(!file.print(message)){
         ESP_LOGI(SD_TAG, "Write failed");
     }
     file.close();
 }
 
 void appendFile(fs::FS &fs, const char * path, const char * message){
-    ESP_LOGI(SD_TAG, "Appending to file: %s\n", path);
-
     File file = fs.open(path, FILE_APPEND);
     if(!file){
         ESP_LOGI(SD_TAG, "Failed to open file for appending");
@@ -204,3 +199,6 @@ void testFileIO(fs::FS &fs, const char * path){
     file.close();
 }
 
+void sdLog(const char * msg){
+    appendFile(SD, "/output.txt", msg);
+}

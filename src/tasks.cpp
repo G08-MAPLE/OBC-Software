@@ -63,7 +63,7 @@ void startTasks(){
     xTaskCreate(
         acc_read,      // Function that should be called
         "acclerometer",   // Name of the task (for debugging)
-        1024*2,            // Stack size (bytes)
+        1024*4,            // Stack size (bytes)
         NULL,            // Parameter to pass
         1,               // Task priority
         NULL             // Task handle

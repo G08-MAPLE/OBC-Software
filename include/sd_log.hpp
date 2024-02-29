@@ -17,6 +17,7 @@ void renameFile(fs::FS &fs, const char * path1, const char * path2);
 void deleteFile(fs::FS &fs, const char * path);
 void testFileIO(fs::FS &fs, const char * path);
 void setup();
+void sdLog(const char * msg);
 
 
 #endif

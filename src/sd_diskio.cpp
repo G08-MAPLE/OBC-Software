@@ -817,7 +817,7 @@ bool sdcard_mount(uint8_t pdrv, const char* path, uint8_t max_files, bool format
               return false;
             }
             //FRESULT f_mkfs (const TCHAR* path, const MKFS_PARM* opt, DWORD au, void* work, UINT len);
-            const BYTE opt = FM_FAT32;
+            const BYTE opt = FM_EXFAT;
             res = f_mkfs(drv, opt, 0, work, sizeof(BYTE) * FF_MAX_SS); //https://hhoegl.informatik.hs-augsburg.de/fablab/STEVAL-3DP001V1/Marlin4ST/stm32_cube/STM32/FatFs/doc/en/mkfs.html
             free(work);
             if (res != FR_OK) {

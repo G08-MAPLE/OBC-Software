@@ -21,15 +21,15 @@ State state = State::BOOT;
 
 //runs once on power up
 void setup() {
-  
+  int cs = 5;
   esp_log_level_set("*", ESP_LOG_INFO);
   ESP_LOGI(TAG, "Starting program");
 
 #ifdef REASSIGN_PINS
     SPI.begin(sck, miso, mosi, cs);
 #endif
-    //if(!SD.begin(cs)){ //Change to this function to manually change CS pin
-    if(!SD.begin()){
+    if(!SD.begin(cs)){ //Change to this function to manually change CS pin
+    // if(!SD.begin()){
         ESP_LOGI(SD_TAG, "Card Mount Failed");
         return;
     }
@@ -54,7 +54,7 @@ void setup() {
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     ESP_LOGI(SD_TAG, "SD Card Size: %lluMB\n", cardSize);
 
-    writeFile(SD, "/output.txt", "");
+    sdLog("test234");
 
   startTasks();
 }
