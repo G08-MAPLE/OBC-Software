@@ -16,7 +16,7 @@ void acc_read(void * param){
     const int SAMPLING_RATE_DELAY = 10;               // Define the sampling rate based on delay vTaskDelayUntil() would provide more accurate sampling
     const int ACC_STATE_CHECK_DELAY = 100;            // Define how long to wait before re-checking system state
     unsigned int conversion;
-    uint16_t measuredForce;
+    float measuredForce;
 
     ADC121C mADC121C = ADC121C(0x50);                 // Address of ADC chip is 0x50, found experimentally, all chips the same
     mADC121C.begin();
@@ -25,7 +25,7 @@ void acc_read(void * param){
         if (state == State::LIVE) {
             conversion = mADC121C.readConversion();
             measuredForce = gForceConversion(conversion);
-            ESP_LOGI(ACC_TAG, "Measured Force: %d G's", measuredForce);
+            ESP_LOGI(ACC_TAG, "Measured Force: %f G's", measuredForce);
             
             // Add support to write to SD card
             // Made sure that write process is thread safe
@@ -38,12 +38,14 @@ void acc_read(void * param){
     }
 }
 
-unsigned int gForceConversion(unsigned int rawADCValue) {
+float gForceConversion(unsigned int rawADCValue) {
     // 12-bit ADC, max value = 4095
     // Max G Force is 500, and is proportional to value read from ADC
+    // Float should have 7 decimal values by default
     const int maxGReading = 500;
     const int maxADCReading = 4095;
-    unsigned int gForceValue = maxGReading*rawADCValue/maxADCReading;
+    // Float conversion needed to get an actual float value
+    float gForceValue = (float) maxGReading*rawADCValue/maxADCReading;
 
     return gForceValue;
 }
