@@ -4,14 +4,14 @@
 #include <Arduino.h>
 #include "main.hpp"
 #include "tasks.hpp"
-#include "spiffs.hpp"
+#include "sd_log.hpp"
 #include "uart.hpp"
+#include "XBEE_Rx.hpp"
 
 static const char *START_TAG = "Start";
 
-extern UARTController xBeeRadio;            //Make xBeeRadio object visible to other threads
 // extern Filesys dartFs;                      //Make dartFs object visible to other threads
-extern char data;
+// extern char* data;
 
 void startup(void * param);
 

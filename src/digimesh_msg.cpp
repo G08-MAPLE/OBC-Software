@@ -28,6 +28,16 @@ int Digimesh_msg::digimesh_parse(uint8_t* dataFrame, int rxBuffIdx) {
         _verifyChecksum();
     }
 
+    else if (_msgType == 0x8B) {
+        ESP_LOGI(DIGIMESH_TAG, "Transmit Status (8B) Received");
+        _extractFrameId(dataFrame);
+        _extractShortAddress(dataFrame);
+        _extractRxOption(dataFrame);            // Actually should be Tx. retry count but pressed for time (will get same result)
+        _extractDeliveryStatus(dataFrame);
+        _extractRxOption(dataFrame);            // Should be Discovery status
+        _extractChecksum(dataFrame);
+        // _verifyChecksum();                   // Requires above to functions TODO: if ever time
+    }
     else {
         ESP_LOGI(DIGIMESH_TAG, "Unexpected frame type received");
     }
