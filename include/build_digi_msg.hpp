@@ -6,6 +6,7 @@
 class Build_digi_msg{
 private:
     int _txFrameSize;                                                   // Size of Frame to be transmitted
+    int _conversionArraySize;
     uint8_t* _txFrame;
     uint8_t _msgLen[2];
     // Methods
@@ -17,6 +18,8 @@ public:
     uint8_t* buildDigiMsg(uint8_t* rxAddress, uint8_t* txData, int txDataLen); // Always know rxAddress is 8 bits
     int get_frameSize();
     void print_txFrame(uint8_t* frameBytes, int frameSize);
+    char* convertToAscii(int accData);
+    int get_conversionArraySize();
 };
 
 #endif

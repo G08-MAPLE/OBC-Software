@@ -16,7 +16,7 @@ public:
     UARTController();
     void config();
     void XBEE_tx(uint8_t* dataTx, int len);
-    void XBEE_digi_static_tx();
+    void XBEE_digi_static_tx(int responseType);
     void XBEE_rx();
     
 };
