@@ -5,6 +5,7 @@
 #include "main.hpp"
 #include <stdio.h>
 #include <Wire.h>
+#include "sd_log.hpp"
 
 // using default i2c bus
 // SDA = GPIO 21
@@ -17,15 +18,18 @@ void acc_read(void * param){
     const int ACC_STATE_CHECK_DELAY = 100;            // Define how long to wait before re-checking system state
     unsigned int conversion;
     float measuredForce;
+    char str[16];
 
     ADC121C mADC121C = ADC121C(0x50);                 // Address of ADC chip is 0x50, found experimentally, all chips the same
     mADC121C.begin();
     
     for(;;){
-        if (state == State::LIVE) {
+        if (state == State::ONLINE) {
             conversion = mADC121C.readConversion();
             measuredForce = gForceConversion(conversion);
-            ESP_LOGI(ACC_TAG, "Measured Force: %f G's", measuredForce);
+            sprintf(str, "%.2f\n", measuredForce);
+            sdLog(str);
+            // ESP_LOGI(ACC_TAG, "Measured Force: %d G's", measuredForce);
             
             // Add support to write to SD card
             // Made sure that write process is thread safe
