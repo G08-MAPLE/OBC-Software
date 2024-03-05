@@ -19,22 +19,16 @@ void acc_read(void * param){
     unsigned int conversion;
     unsigned int measuredForce;
     char str[16];
-    int i = 0;
 
     ADC121C mADC121C = ADC121C(0x50);                 // Address of ADC chip is 0x50, found experimentally
     mADC121C.begin();
     
     for(;;){
         if (state == State::ONLINE) {
-            // conversion = mADC121C.readConversion();
-            // measuredForce = gForceConversion(conversion);
-            if(i < 10){
-                measuredForce = 69;
-                sprintf(str, "ACC: %d Gs\n", measuredForce);
-                ESP_LOGI(ACC_TAG, "%s", str);
-                sdLog(str);
-                i++;
-            }
+            conversion = mADC121C.readConversion();
+            measuredForce = gForceConversion(conversion);
+            sprintf(str, "%d\n", measuredForce);
+            sdLog(str);
             // ESP_LOGI(ACC_TAG, "Measured Force: %d G's", measuredForce);
             
             // Add support to write to SD card

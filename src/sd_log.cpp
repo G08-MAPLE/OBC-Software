@@ -131,9 +131,7 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
         ESP_LOGI(SD_TAG, "Failed to open file for appending");
         return;
     }
-    if(file.print(message)){
-        ESP_LOGI(SD_TAG, "Message appended");
-    } else {
+    if(!file.print(message)){
         ESP_LOGI(SD_TAG, "Append failed");
     }
     file.close();

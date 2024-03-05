@@ -54,8 +54,6 @@ void setup() {
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     ESP_LOGI(SD_TAG, "SD Card Size: %lluMB\n", cardSize);
 
-    sdLog("test234");
-
   startTasks();
 }
 
