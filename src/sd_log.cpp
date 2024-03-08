@@ -41,6 +41,8 @@
 
 #include "sd_log.hpp"
 #include "esp_log.h"
+#include <Arduino.h>
+#include <stdio.h>
 
 /*
 Uncomment and set up if you want to use custom pins for the SPI communication
@@ -198,5 +200,7 @@ void testFileIO(fs::FS &fs, const char * path){
 }
 
 void sdLog(const char * msg){
-    appendFile(SD, "/output.txt", msg);
+    char* str2prnt;
+    sprintf(str2prnt, "[%u] %s", millis(), msg);
+    appendFile(SD, "/output.txt", str2prnt);
 }
