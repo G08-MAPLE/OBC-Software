@@ -201,6 +201,6 @@ void testFileIO(fs::FS &fs, const char * path){
 
 void sdLog(const char * msg){
     char* str2prnt;
-    sprintf(str2prnt, "[%i] %s", millis(), msg);
+    sprintf(str2prnt, "[%u] %s", millis(), msg);
     appendFile(SD, "/output.txt", str2prnt);
 }
