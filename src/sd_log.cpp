@@ -53,6 +53,8 @@ int mosi = -1;
 int cs = -1;
 */
 
+char str2prnt[50];
+
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     ESP_LOGI(SD_TAG, "Listing directory: %s\n", dirname);
 
@@ -200,7 +202,6 @@ void testFileIO(fs::FS &fs, const char * path){
 }
 
 void sdLog(const char * msg){
-    char* str2prnt;
     sprintf(str2prnt, "[%u] %s", millis(), msg);
     appendFile(SD, "/output.txt", str2prnt);
 }
